@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easy Track — Pixel Config Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05090f;
+  --bg2: #080e1a;
+  --bg3: #0b1525;
+  --gold: #e8b84b;
+  --gold2: #c8962a;
+  --gold-glow: rgba(232,184,75,0.15);
+  --gold-dim: rgba(232,184,75,0.08);
+  --grn: #34d399;
+  --grn-dim: rgba(52,211,153,0.08);
+  --wht: #eef2ff;
+  --wht2: #a8b8d0;
+  --mut: #4a6080;
+  --bdr: rgba(232,184,75,0.12);
+  --bdr2: rgba(255,255,255,0.05);
+  --red: #f87171;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--wht);
+  font-family: 'Cairo', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── NOISE OVERLAY ─── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; opacity:0.4;
+}
+
+/* ─── NAV ─── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 48px;
+  background:rgba(5,9,15,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bdr2);
+}
+.logo {
+  display:flex; align-items:center; gap:12px;
+  font-family:'JetBrains Mono',monospace; font-size:13px;
+  color:var(--gold); letter-spacing:3px; text-transform:uppercase;
+  text-decoration:none;
+}
+.logo-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--gold); box-shadow:0 0 12px var(--gold);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+@keyframes ping { 0%{transform:scale(1);opacity:.4} 100%{transform:scale(2.5);opacity:0} }
+
+.nav-links { display:flex; align-items:center; gap:32px; }
+.nav-link {
+  color:var(--wht2); text-decoration:none; font-size:14px; font-weight:600;
+  transition:color .2s; letter-spacing:.5px;
+}
+.nav-link:hover { color:var(--gold); }
+.nav-cta {
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#05090f; border:none; border-radius:10px;
+  padding:10px 24px; font-family:'Cairo',sans-serif;
+  font-size:14px; font-weight:900; cursor:pointer;
+  transition:all .25s; text-decoration:none; display:inline-block;
+}
+.nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(232,184,75,.35); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  position:relative; padding:120px 48px 80px;
+  text-align:center;
+}
+
+/* background grid */
+.hero::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(232,184,75,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,184,75,.04) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);
+}
+
+/* glow orbs */
+.hero::after {
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 20%,rgba(232,184,75,.07),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 70% 80%,rgba(52,211,153,.05),transparent 55%);
+  pointer-events:none;
+}
+
+.hero-inner { position:relative; z-index:1; max-width:860px; margin:0 auto; }
+
+.hero-badge {
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--gold-dim); border:1px solid var(--bdr);
+  border-radius:100px; padding:8px 20px;
+  font-family:'JetBrains Mono',monospace; font-size:11px;
+  color:var(--gold); letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:32px;
+  animation:fadeUp .8s ease both;
+}
+
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.hero-title {
+  font-family:'Cairo',sans-serif;
+  font-size:clamp(36px,6vw,72px);
+  font-weight:800; line-height:1.1;
+  margin-bottom:8px;
+  animation:fadeUp .8s .1s ease both;
+}
+.hero-title .ar {
+  display:block;
+  font-family:'Cairo',sans-serif;
+  font-weight:900;
+}
+.hero-title em { font-style:normal; color:var(--gold); }
+.hero-title .grn { color:var(--grn); }
+
+.hero-sub {
+  font-size:clamp(15px,2vw,19px); color:var(--wht2);
+  line-height:1.8; max-width:600px; margin:24px auto 40px;
+  animation:fadeUp .8s .2s ease both;
+}
+
+.hero-actions {
+  display:flex; align-items:center; justify-content:center;
+  gap:16px; flex-wrap:wrap;
+  animation:fadeUp .8s .3s ease both;
+}
+.btn-primary {
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#05090f; border:none; border-radius:14px;
+  padding:16px 36px; font-family:'Cairo',sans-serif;
+  font-size:16px; font-weight:900; cursor:pointer;
+  transition:all .25s; text-decoration:none; display:inline-flex;
+  align-items:center; gap:10px;
+}
+.btn-primary:hover { transform:translateY(-3px); box-shadow:0 16px 40px rgba(232,184,75,.35); }
+.btn-secondary {
+  background:transparent; color:var(--wht);
+  border:1.5px solid var(--bdr); border-radius:14px;
+  padding:16px 36px; font-family:'Cairo',sans-serif;
+  font-size:15px; font-weight:700; cursor:pointer;
+  transition:all .25s; text-decoration:none;
+}
+.btn-secondary:hover { border-color:rgba(232,184,75,.4); color:var(--gold); }
+
+.hero-stats {
+  display:flex; align-items:center; justify-content:center;
+  gap:48px; margin-top:72px; flex-wrap:wrap;
+  animation:fadeUp .8s .4s ease both;
+}
+.stat { text-align:center; }
+.stat-num {
+  font-family:'JetBrains Mono',monospace; font-size:32px;
+  font-weight:700; color:var(--gold); display:block;
+}
+.stat-lbl { font-size:12px; color:var(--mut); margin-top:4px; letter-spacing:1px; }
+
+/* ─── DIVIDER ─── */
+.divider {
+  height:1px; background:linear-gradient(to right,transparent,var(--bdr),transparent);
+  margin:0 48px;
+}
+
+/* ─── SECTION ─── */
+section { padding:100px 48px; position:relative; }
+.section-inner { max-width:1100px; margin:0 auto; }
+
+.sec-label {
+  font-family:'JetBrains Mono',monospace; font-size:11px;
+  color:var(--gold); letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:16px; display:flex; align-items:center; gap:12px;
+}
+.sec-label::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(to right,var(--bdr),transparent);
+}
+.sec-title {
+  font-size:clamp(28px,4vw,44px); font-weight:900;
+  line-height:1.2; margin-bottom:16px;
+}
+.sec-title em { font-style:normal; color:var(--gold); }
+.sec-sub { color:var(--wht2); font-size:16px; line-height:1.8; max-width:600px; }
+
+/* ─── HOW IT WORKS ─── */
+.steps-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:24px; margin-top:64px;
+}
+.step-card {
+  background:var(--bg2); border:1px solid var(--bdr2);
+  border-radius:20px; padding:32px 28px;
+  position:relative; overflow:hidden;
+  transition:all .3s;
+}
+.step-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,var(--gold-dim),transparent);
+  opacity:0; transition:opacity .3s;
+}
+.step-card:hover { border-color:var(--bdr); transform:translateY(-4px); }
+.step-card:hover::before { opacity:1; }
+.step-num {
+  font-family:'JetBrains Mono',monospace; font-size:11px;
+  color:var(--gold); letter-spacing:2px; margin-bottom:20px;
+  display:block;
+}
+.step-icon { font-size:36px; margin-bottom:16px; display:block; }
+.step-title { font-size:17px; font-weight:900; margin-bottom:10px; }
+.step-body { color:var(--wht2); font-size:13.5px; line-height:1.75; }
+
+/* ─── FEATURES ─── */
+.features-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:20px; margin-top:64px;
+}
+.feat-card {
+  background:var(--bg2); border:1px solid var(--bdr2);
+  border-radius:16px; padding:28px;
+  transition:all .3s;
+}
+.feat-card:hover { border-color:var(--bdr); box-shadow:0 12px 40px rgba(232,184,75,.06); }
+.feat-icon {
+  width:48px; height:48px; border-radius:12px;
+  background:var(--gold-dim); border:1px solid var(--bdr);
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; margin-bottom:18px;
+}
+.feat-title { font-size:16px; font-weight:900; margin-bottom:8px; }
+.feat-body { color:var(--wht2); font-size:13.5px; line-height:1.75; }
+.feat-tag {
+  display:inline-block; margin-top:14px;
+  background:var(--grn-dim); border:1px solid rgba(52,211,153,.2);
+  color:var(--grn); border-radius:100px; padding:3px 12px;
+  font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px;
+}
+
+/* ─── PRICING ─── */
+.pricing-grid {
+  display:flex; flex-direction:row-reverse;
+  gap:24px; margin-top:64px; align-items:start;
+}
+.pricing-grid .plan-card { flex:1; min-width:0; }
+@media(max-width:900px){ 
+  .pricing-grid{ flex-direction:column; }
+  .pricing-grid .plan-card{ order:unset !important; }
+  .plan-card.featured{ transform:none; }
+}
+
+.plan-card {
+  background:var(--bg2); border:1px solid var(--bdr2);
+  border-radius:24px; padding:36px 32px;
+  position:relative; transition:all .3s;
+}
+.plan-card.featured {
+  background:linear-gradient(135deg,rgba(232,184,75,.06),rgba(232,184,75,.02));
+  border-color:rgba(232,184,75,.3);
+  box-shadow:0 0 0 1px rgba(232,184,75,.1), 0 32px 64px rgba(232,184,75,.08);
+  transform:scale(1.03);
+}
+.plan-badge {
+  position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#05090f; border-radius:100px; padding:5px 18px;
+  font-size:11px; font-weight:900; letter-spacing:1px; white-space:nowrap;
+}
+.plan-name {
+  font-family:'JetBrains Mono',monospace; font-size:12px;
+  color:var(--gold); letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:20px;
+}
+.plan-price {
+  display:flex; align-items:flex-end; gap:6px; margin-bottom:8px;
+}
+.plan-amt {
+  font-family:'Cairo',sans-serif; font-size:52px;
+  font-weight:800; color:var(--wht); line-height:1;
+}
+.plan-cur { font-size:22px; color:var(--wht2); margin-bottom:8px; }
+.plan-period { font-size:13px; color:var(--mut); margin-bottom:6px; }
+.plan-tagline { color:var(--wht2); font-size:14px; margin-bottom:28px; line-height:1.6; }
+.plan-divider { height:1px; background:var(--bdr2); margin-bottom:24px; }
+.plan-features { list-style:none; display:flex; flex-direction:column; gap:12px; margin-bottom:32px; }
+.plan-features li {
+  display:flex; align-items:flex-start; gap:10px;
+  font-size:14px; color:var(--wht2); line-height:1.5;
+}
+.plan-features li::before {
+  content:'✓'; color:var(--grn); font-weight:900;
+  font-family:'JetBrains Mono',monospace; flex-shrink:0; margin-top:1px;
+}
+.plan-features li.muted::before { content:'–'; color:var(--mut); }
+.plan-features li.muted { color:var(--mut); }
+.plan-btn {
+  width:100%; border-radius:12px; padding:14px;
+  font-family:'Cairo',sans-serif; font-size:15px; font-weight:900;
+  cursor:pointer; transition:all .25s; border:none;
+}
+.plan-btn.primary {
+  background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#05090f;
+}
+.plan-btn.primary:hover { box-shadow:0 8px 24px rgba(232,184,75,.35); transform:translateY(-2px); }
+.plan-btn.ghost {
+  background:transparent; color:var(--wht);
+  border:1.5px solid var(--bdr2);
+}
+.plan-btn.ghost:hover { border-color:var(--bdr); color:var(--gold); }
+.plan-btn.enterprise {
+  background:var(--bg3); color:var(--wht);
+  border:1.5px solid var(--bdr);
+}
+.plan-btn.enterprise:hover { border-color:rgba(232,184,75,.4); }
+
+/* ─── WHO IS IT FOR ─── */
+.audience-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px; margin-top:48px;
+}
+.aud-card {
+  background:var(--bg2); border:1px solid var(--bdr2);
+  border-radius:16px; padding:28px 24px;
+  display:flex; gap:16px; align-items:flex-start;
+  transition:all .3s;
+}
+.aud-card:hover { border-color:var(--bdr); transform:translateY(-3px); }
+.aud-icon {
+  width:44px; height:44px; border-radius:12px;
+  background:var(--gold-dim); border:1px solid var(--bdr);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.aud-title { font-size:15px; font-weight:900; margin-bottom:6px; }
+.aud-body { color:var(--wht2); font-size:13px; line-height:1.7; }
+
+/* ─── PLATFORMS ─── */
+.platforms-strip {
+  display:flex; align-items:center; justify-content:center;
+  gap:12px; flex-wrap:wrap; margin-top:48px;
+}
+.plat-pill {
+  display:flex; align-items:center; gap:10px;
+  background:var(--bg2); border:1px solid var(--bdr2);
+  border-radius:100px; padding:12px 24px;
+  font-size:14px; font-weight:700;
+  transition:all .25s;
+}
+.plat-pill:hover { border-color:var(--bdr); transform:translateY(-2px); }
+.plat-pill .dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--grn); box-shadow:0 0 8px var(--grn);
+}
+
+/* ─── TECH STACK ─── */
+.stack-row {
+  display:flex; align-items:center; gap:12px;
+  flex-wrap:wrap; margin-top:32px;
+}
+.stack-tag {
+  background:var(--bg3); border:1px solid var(--bdr2);
+  border-radius:8px; padding:8px 16px;
+  font-family:'JetBrains Mono',monospace; font-size:12px;
+  color:var(--wht2); letter-spacing:.5px;
+}
+.stack-tag.highlight { border-color:var(--bdr); color:var(--gold); }
+
+/* ─── CTA BANNER ─── */
+.cta-banner {
+  background:linear-gradient(135deg,rgba(232,184,75,.08),rgba(52,211,153,.04));
+  border:1px solid rgba(232,184,75,.15); border-radius:28px;
+  padding:72px 48px; text-align:center; position:relative; overflow:hidden;
+}
+.cta-banner::before {
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(circle 300px at 20% 50%,rgba(232,184,75,.06),transparent),
+    radial-gradient(circle 300px at 80% 50%,rgba(52,211,153,.04),transparent);
+  pointer-events:none;
+}
+.cta-banner-inner { position:relative; z-index:1; }
+.cta-title { font-size:clamp(24px,4vw,44px); font-weight:900; margin-bottom:16px; }
+.cta-title em { font-style:normal; color:var(--gold); }
+.cta-sub { color:var(--wht2); font-size:16px; margin-bottom:40px; }
+
+/* ─── FOOTER ─── */
+footer {
+  padding:48px; border-top:1px solid var(--bdr2);
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:24px;
+}
+.footer-logo { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
+.footer-links { display:flex; gap:24px; }
+.footer-link { color:var(--mut); font-size:13px; text-decoration:none; transition:color .2s; }
+.footer-link:hover { color:var(--wht2); }
+.footer-copy { color:var(--mut); font-size:12px; }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(5,9,15,.92); backdrop-filter:blur(20px);
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+}
+.modal-overlay.on { opacity:1; pointer-events:all; }
+.modal {
+  background:var(--bg2); border:1px solid var(--bdr);
+  border-radius:24px; padding:48px 40px; max-width:480px; width:100%;
+  transform:scale(.95) translateY(20px); transition:all .35s;
+  box-shadow:0 40px 80px rgba(0,0,0,.6);
+}
+.modal-overlay.on .modal { transform:scale(1) translateY(0); }
+.modal-title { font-size:24px; font-weight:900; margin-bottom:8px; }
+.modal-sub { color:var(--wht2); font-size:14px; margin-bottom:32px; line-height:1.7; }
+.modal-tabs {
+  display:flex; gap:4px; background:rgba(0,0,0,.4);
+  border:1px solid var(--bdr2); padding:4px; border-radius:12px; margin-bottom:28px;
+}
+.modal-tab {
+  flex:1; padding:10px; border-radius:9px; border:none;
+  background:transparent; color:var(--wht2); font-family:'Cairo',sans-serif;
+  font-size:14px; font-weight:700; cursor:pointer; transition:all .2s;
+}
+.modal-tab.on { background:var(--bg3); color:var(--wht); }
+.modal-form { display:flex; flex-direction:column; gap:14px; }
+.modal-input {
+  background:rgba(255,255,255,.03); border:1.5px solid rgba(255,255,255,.08);
+  border-radius:12px; padding:14px 18px; color:var(--wht);
+  font-family:'Cairo',sans-serif; font-size:14px; outline:none;
+  transition:all .2s; width:100%;
+}
+.modal-input:focus { border-color:rgba(232,184,75,.5); background:rgba(232,184,75,.04); }
+.modal-input::placeholder { color:var(--mut); }
+.modal-btn {
+  width:100%; background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#05090f; border:none; border-radius:12px; padding:15px;
+  font-family:'Cairo',sans-serif; font-size:15px; font-weight:900;
+  cursor:pointer; transition:all .25s; margin-top:4px;
+}
+.modal-btn:hover { box-shadow:0 8px 24px rgba(232,184,75,.35); transform:translateY(-1px); }
+.modal-close {
+  position:absolute; top:20px; left:20px; /* RTL: left */
+  width:36px; height:36px; border-radius:50%;
+  background:rgba(255,255,255,.05); border:1px solid var(--bdr2);
+  color:var(--wht2); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.modal-close:hover { background:rgba(255,255,255,.1); color:var(--wht); }
+.modal-wrapper { position:relative; }
+.modal-divider {
+  display:flex; align-items:center; gap:12px; margin:4px 0;
+  color:var(--mut); font-size:12px;
+}
+.modal-divider::before, .modal-divider::after {
+  content:''; flex:1; height:1px; background:var(--bdr2);
+}
+
+@media(max-width:768px){
+  nav { padding:16px 20px; }
+  .nav-links { display:none; }
+  section { padding:72px 20px; }
+  .hero { padding:100px 20px 60px; }
+  footer { padding:32px 20px; flex-direction:column; text-align:center; }
+  .cta-banner { padding:48px 24px; }
+  .hero-stats { gap:28px; }
+  .stat-num { font-size:26px; }
+  .steps-grid { grid-template-columns:1fr; }
+  .features-grid { grid-template-columns:1fr; }
+  .audience-grid { grid-template-columns:1fr; }
+  .plan-card.featured { transform:none; }
+  .hero-title { font-size:32px; }
+  .hero-sub { font-size:15px; }
+  .sec-title { font-size:26px; }
+  .plan-amt { font-size:42px; }
+}
+@media(min-width:769px) and (max-width:1100px){
+  .pricing-grid { gap:16px; }
+  .plan-card { padding:28px 20px; }
+  .plan-amt { font-size:40px; }
+}
+
+/* ════════════════════════════════
+   SPLASH SCREEN
+════════════════════════════════ */
+#et-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #05090f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+#et-splash.done {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+/* grid lines */
+#et-splash::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(232,184,75,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,184,75,.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+}
+/* center glow */
+#et-splash::after {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,184,75,.1) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: sGlow 2s ease-in-out infinite alternate;
+}
+@keyframes sGlow {
+  from { transform: translate(-50%,-50%) scale(0.9); opacity: 0.7; }
+  to   { transform: translate(-50%,-50%) scale(1.1); opacity: 1; }
+}
+
+/* ── 3D Logo ── */
+.sp-scene {
+  position: relative; z-index: 10;
+  perspective: 700px;
+  width: 160px; height: 160px;
+  display: flex; align-items: center; justify-content: center;
+}
+.sp-logo {
+  width: 130px; height: 130px;
+  position: relative;
+  transform-origin: center center;
+  animation: sp3d 1.8s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes sp3d {
+  0%   { transform: rotateX(75deg) rotateY(-45deg) scale(0.15); opacity: 0; }
+  25%  { opacity: 1; }
+  65%  { transform: rotateX(-6deg) rotateY(12deg) scale(1.06); }
+  82%  { transform: rotateX(3deg) rotateY(-4deg) scale(0.97); }
+  100% { transform: rotateX(0deg) rotateY(0deg) scale(1); opacity: 1; }
+}
+.sp-logo svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0;
+  animation: spRing 0.4s ease forwards;
+}
+.sp-logo svg:nth-child(1) { animation-delay: 0.35s; }
+.sp-logo svg:nth-child(2) { animation-delay: 0.55s; }
+.sp-logo svg:nth-child(3) { animation-delay: 0.72s; }
+.sp-logo svg:nth-child(4) { animation-delay: 0.88s; }
+.sp-logo svg:nth-child(5) { animation-delay: 1.02s; }
+@keyframes spRing {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* shadow below logo */
+.sp-shadow {
+  position: absolute;
+  bottom: -14px; left: 50%;
+  transform: translateX(-50%);
+  width: 70px; height: 10px;
+  background: radial-gradient(ellipse, rgba(232,184,75,.35) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(4px);
+  opacity: 0;
+  animation: spShadow 1.8s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes spShadow {
+  0%   { opacity: 0; transform: translateX(-50%) scaleX(0.2); }
+  100% { opacity: 0.5; transform: translateX(-50%) scaleX(1); }
+}
+
+/* ── Text ── */
+.sp-text {
+  position: relative; z-index: 10;
+  text-align: center;
+  margin-top: 28px;
+}
+.sp-brand {
+  display: block;
+  font-family: 'Outfit', 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: #f0f4ff;
+  opacity: 0;
+  transform: translateY(24px);
+  animation: spText 0.6s cubic-bezier(.16,1,.3,1) 1.25s forwards;
+}
+.sp-brand .gold { color: #e8b84b; }
+.sp-mono {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #0ecfb0;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  margin-top: 10px;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: spText 0.6s cubic-bezier(.16,1,.3,1) 1.5s forwards;
+}
+@keyframes spText {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Progress bar ── */
+.sp-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,.04);
+}
+.sp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e8b84b, #0ecfb0);
+  border-radius: 0 2px 2px 0;
+  width: 0;
+  animation: spBar 2.2s ease forwards;
+}
+@keyframes spBar {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════ SPLASH SCREEN ════ -->
+<div id="et-splash">
+  <div class="sp-scene">
+    <div class="sp-logo">
+
+      <!-- Layer 1: outer arcs (faintest) -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="130" y2="130" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#e8b84b" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#0ecfb0" stop-opacity="0.35"/>
+          </linearGradient>
+        </defs>
+        <path d="M8 60 C8 30.177 32.177 6 62 6" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M122 60 C122 30.177 97.823 6 68 6" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Layer 2: mid-outer arcs -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <defs>
+          <linearGradient id="g2" x1="0" y1="0" x2="130" y2="130" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#e8b84b" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#0ecfb0" stop-opacity="0.6"/>
+          </linearGradient>
+        </defs>
+        <path d="M22 60 C22 37.909 39.909 20 62 20" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M108 60 C108 37.909 90.091 20 68 20" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Layer 3: inner arcs -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <path d="M38 60 C38 47.297 48.297 37 61 37" stroke="#e8b84b" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M92 60 C92 47.297 81.703 37 69 37" stroke="#e8b84b" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Layer 4: center dot with glow -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <defs>
+          <radialGradient id="dotg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#f5d27a"/>
+            <stop offset="100%" stop-color="#e8b84b"/>
+          </radialGradient>
+          <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <circle cx="65" cy="60" r="16" fill="rgba(232,184,75,0.12)" filter="url(#dotGlow)"/>
+        <circle cx="65" cy="60" r="9" fill="url(#dotg)"/>
+      </svg>
+
+      <!-- Layer 5: tracking arrow -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <defs>
+          <linearGradient id="arrowg" x1="65" y1="76" x2="65" y2="108" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#e8b84b"/>
+            <stop offset="100%" stop-color="#0ecfb0"/>
+          </linearGradient>
+        </defs>
+        <path d="M54 78 L65 106 L76 78" stroke="url(#arrowg)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+
+    </div>
+    <div class="sp-shadow"></div>
+  </div>
+
+  <div class="sp-text">
+    <span class="sp-brand">easy<span class="gold">TRACK</span></span>
+    <span class="sp-mono">Pixel Config Generator</span>
+  </div>
+
+  <div class="sp-bar"><div class="sp-bar-fill"></div></div>
+</div>
+
+<!-- ════ NAV ════ -->
+<nav>
+  <a href="#" class="logo" style="gap:10px; letter-spacing:0;">
+    <!-- SVG Logo Mark -->
+    <svg width="34" height="34" viewBox="0 0 64 64" fill="none" style="flex-shrink:0;">
+      <defs>
+        <linearGradient id="navG" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#e8b84b"/>
+          <stop offset="100%" stop-color="#0ecfb0"/>
+        </linearGradient>
+      </defs>
+      <path d="M4 30 C4 15.088 16.088 3 31 3" stroke="url(#navG)" stroke-width="2.5" stroke-linecap="round" opacity=".45"/>
+      <path d="M60 30 C60 15.088 47.912 3 33 3" stroke="url(#navG)" stroke-width="2.5" stroke-linecap="round" opacity=".45"/>
+      <path d="M13 30 C13 20.611 20.611 13 30 13" stroke="url(#navG)" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>
+      <path d="M51 30 C51 20.611 43.389 13 34 13" stroke="url(#navG)" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>
+      <path d="M22 30 C22 25.029 26.029 21 31 21" stroke="#e8b84b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M42 30 C42 25.029 37.971 21 33 21" stroke="#e8b84b" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="32" cy="30" r="6" fill="url(#navG)"/>
+      <path d="M27 40 L32 52 L37 40" stroke="url(#navG)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <!-- Text -->
+    <span style="display:flex;flex-direction:column;line-height:1;gap:2px;">
+      <span style="font-family:'Outfit','Cairo',sans-serif;font-weight:900;font-size:16px;letter-spacing:-0.5px;color:#f0f4ff;">easy<span style="color:#e8b84b;">TRACK</span></span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:2.5px;color:#0ecfb0;text-transform:uppercase;">Pixel Config</span>
+    </span>
+  </a>
+  <div class="nav-links">
+    <a href="#how" class="nav-link">كيف يعمل؟</a>
+    <a href="#features" class="nav-link">المميزات</a>
+    <a href="#pricing" class="nav-link">الأسعار</a>
+    <a href="#" class="nav-link" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut)">EN</a>
+  </div>
+  <a href="#" class="nav-cta" onclick="openModal(event)">ابدأ دلوقتي ←</a>
+  <!-- Admin link (subtle) -->
+  <a href="admin.html" style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.08);letter-spacing:2px;text-decoration:none;padding:3px 8px;border-radius:4px;transition:color .3s;" onmouseover="this.style.color='rgba(232,184,75,.3)'" onmouseout="this.style.color='rgba(255,255,255,.08)'">ADMIN</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <div class="logo-dot"></div>
+      Pixel Config Generator · GA4 Official Schema
+    </div>
+
+    <h1 class="hero-title">
+      <span class="ar">احصل على <em>Pixel Setup</em> كامل</span>
+      <span class="ar">في <span class="grn">دقيقتين</span> — من أول مرة</span>
+    </h1>
+
+    <p class="hero-sub">
+      أداة Easy Track بتولّد لك GTM Container + DataLayer Code + JSON Config
+      بناءً على GA4 Official Schema من Google —
+      تدعم Meta وSnapchat وTikTok وGoogle Ads وX
+    </p>
+
+    <div class="hero-actions">
+      <a href="#" class="btn-primary" onclick="openModal(event)">
+        🚀 ابدأ دلوقتي
+      </a>
+      <a href="#how" class="btn-secondary">شوف كيف يعمل</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num">5+</span>
+        <div class="stat-lbl">PLATFORMS SUPPORTED</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num">15</span>
+        <div class="stat-lbl">GA4 EVENTS</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num">3</span>
+        <div class="stat-lbl">OUTPUT FORMATS</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num">2min</span>
+        <div class="stat-lbl">SETUP TIME</div>
+      </div>
+    </div>
+
+    <!-- LIVE COUNTER -->
+    <div style="margin-top:48px; display:flex; justify-content:center;">
+      <div style="
+        display:inline-flex; align-items:center; gap:14px;
+        background:rgba(52,211,153,0.06); border:1px solid rgba(52,211,153,0.2);
+        border-radius:100px; padding:14px 28px;
+        animation:fadeUp .8s .5s ease both;
+      ">
+        <div style="position:relative;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--grn);box-shadow:0 0 12px var(--grn);"></div>
+          <div style="position:absolute;inset:0;border-radius:50%;background:var(--grn);animation:ping 1.5s infinite;opacity:0.4;"></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--grn);letter-spacing:1px;">
+          <span id="subCount">--</span> مشترك نشط دلوقتي
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PLATFORMS -->
+<section style="padding:60px 48px;">
+  <div class="section-inner">
+    <div style="text-align:center; margin-bottom:36px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);letter-spacing:2px;text-transform:uppercase;">المنصات المدعومة</span>
+    </div>
+    <div class="platforms-strip">
+      <div class="plat-pill"><div class="dot"></div>Meta Pixel</div>
+      <div class="plat-pill"><div class="dot"></div>Snapchat</div>
+      <div class="plat-pill"><div class="dot"></div>TikTok</div>
+      <div class="plat-pill"><div class="dot"></div>Google Ads</div>
+      <div class="plat-pill"><div class="dot"></div>Google Analytics</div>
+      <div class="plat-pill"><div class="dot"></div>X / Twitter</div>
+    </div>
+    <div class="stack-row" style="justify-content:center;margin-top:32px;">
+      <span class="stack-tag highlight">GTM Container Export</span>
+      <span class="stack-tag highlight">DataLayer Code</span>
+      <span class="stack-tag highlight">JSON Config</span>
+      <span class="stack-tag">Salla</span>
+      <span class="stack-tag">Zid</span>
+      <span class="stack-tag">WooCommerce</span>
+      <span class="stack-tag">Shopify</span>
+      <span class="stack-tag">Custom</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <div class="sec-label">How It Works</div>
+    <h2 class="sec-title">٤ خطوات وخلاص</h2>
+    <p class="sec-sub">مفيش تعقيد. اختار، ادخل الـ IDs، اضغط زر — وعندك كل حاجة جاهزة للـ import.</p>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <span class="step-num">STEP 01</span>
+        <span class="step-icon">🏪</span>
+        <div class="step-title">اختار الـ CMS</div>
+        <div class="step-body">سلة، زد، WooCommerce، Shopify، أو Custom Site — الأداة بتتكيّف تلقائياً مع كل منصة.</div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">STEP 02</span>
+        <span class="step-icon">📡</span>
+        <div class="step-title">اختار المنصات</div>
+        <div class="step-body">اختار من Meta وSnapchat وTikTok وGoogle Ads وX — ممكن تختار أكتر من واحدة في نفس الوقت.</div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">STEP 03</span>
+        <span class="step-icon">⚡</span>
+        <div class="step-title">حدد الـ Events</div>
+        <div class="step-body">اختار الـ events من GA4 Recommended Events — من ViewContent للـ Purchase، كل event بـ score من 1 لـ 10.</div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">STEP 04</span>
+        <span class="step-icon">📦</span>
+        <div class="step-title">احمّل وشغّل</div>
+        <div class="step-body">GTM Container جاهز للـ import، DataLayer Code جاهز للـ developer، وJSON Config للتوثيق.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section id="features" style="background:var(--bg2);">
+  <div class="section-inner">
+    <div class="sec-label">Features</div>
+    <h2 class="sec-title">كل حاجة محتاجها في <em>حتة واحدة</em></h2>
+    <p class="sec-sub">مش مجرد tool — ده نظام متكامل بيوفّر عليك ساعات من العمل اليدوي.</p>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📦</div>
+        <div class="feat-title">GTM Container Export</div>
+        <div class="feat-body">ملف JSON جاهز للـ import مباشرة في GTM — بيضيف Tags وTriggers وVariables تلقائياً بدون أي إعداد يدوي.</div>
+        <span class="feat-tag">IMPORT READY</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏷️</div>
+        <div class="feat-title">DataLayer Code</div>
+        <div class="feat-body">كود JavaScript جاهز بـ window.dataLayer.push() لكل event — مبني على GA4 Official Schema من Google.</div>
+        <span class="feat-tag">GA4 SCHEMA</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📄</div>
+        <div class="feat-title">JSON Config</div>
+        <div class="feat-body">ملف توثيق شامل بكل الـ events والـ parameters والـ platform mappings — سهل الـ share مع الـ team.</div>
+        <span class="feat-tag">DOCUMENTATION</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🎯</div>
+        <div class="feat-title">Base Code لكل منصة</div>
+        <div class="feat-body">الـ GTM Container بيحتوي على Base Initialization Code لكل platform — بيتنار على All Pages تلقائياً بـ Pixel ID بتاعك.</div>
+        <span class="feat-tag">AUTO INIT</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⭐</div>
+        <div class="feat-title">Event Scoring</div>
+        <div class="feat-body">كل event عنده score من 1 لـ 10 بناءً على قيمته للـ Algorithm — بيساعدك تحدد الأولويات وتقنع الكلاينت.</div>
+        <span class="feat-tag">DATA-DRIVEN</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📋</div>
+        <div class="feat-title">Implementation Guide</div>
+        <div class="feat-body">دليل تثبيت خطوة بخطوة مخصص لكل CMS ومنصة اخترتها — مش generic، مخصص لـ setup بتاعك بالظبط.</div>
+        <span class="feat-tag">STEP-BY-STEP</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WHO IS IT FOR -->
+<section>
+  <div class="section-inner">
+    <div class="sec-label">Who Is It For</div>
+    <h2 class="sec-title">مناسبة لـ <em>مين؟</em></h2>
+    <div class="audience-grid">
+      <div class="aud-card">
+        <div class="aud-icon">💼</div>
+        <div>
+          <div class="aud-title">Freelancers في Analytics</div>
+          <div class="aud-body">وفّر ساعات من الـ setup اليدوي وقدّم output احترافي لكلايانتك من أول جلسة.</div>
+        </div>
+      </div>
+      <div class="aud-card">
+        <div class="aud-icon">🏢</div>
+        <div>
+          <div class="aud-title">Marketing Agencies</div>
+          <div class="aud-body">ستاندرد موحد لكل مشاريع الـ pixel setup — سهل الـ onboarding وأقل errors.</div>
+        </div>
+      </div>
+      <div class="aud-card">
+        <div class="aud-icon">🛍️</div>
+        <div>
+          <div class="aud-title">E-commerce Managers</div>
+          <div class="aud-body">ربط Meta وSnapchat وTikTok بمتجرك على سلة أو زد بدون ما تحتاج developer.</div>
+        </div>
+      </div>
+      <div class="aud-card">
+        <div class="aud-icon">📊</div>
+        <div>
+          <div class="aud-title">Media Buyers</div>
+          <div class="aud-body">تأكد إن الـ conversion events شغالين صح قبل تشغيل أي campaign — مش بعدها.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section id="pricing" style="background:var(--bg2);">
+  <div class="section-inner">
+    <div class="sec-label">Pricing</div>
+    <h2 class="sec-title" style="text-align:center;">ادفع مرة، وفّر <em>ساعات</em></h2>
+    <p class="sec-sub" style="text-align:center;margin:0 auto 0;">أسعار مناسبة للفريلانسر والأجنسي — بدون subscriptions خفية.</p>
+
+    <div class="pricing-grid">
+
+      <!-- BASIC -->
+      <div class="plan-card" style="order:3;">
+        <div class="plan-name">Basic</div>
+        <div class="plan-price" dir="ltr" style="justify-content:flex-end;">
+          <span class="plan-amt">29</span>
+          <span class="plan-cur" style="font-size:24px;color:var(--gold);font-weight:700;margin-bottom:10px;">$</span>
+        </div>
+        <div class="plan-period">/ شهرياً · مشروع واحد</div>
+        <div class="plan-tagline">مثالي للفريلانسر اللي بيشتغل على كلاينت واحد في نفس الوقت.</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>مشروع واحد</li>
+          <li>GTM Container Export</li>
+          <li>DataLayer Code</li>
+          <li>JSON Config</li>
+          <li>Implementation Guide</li>
+          <li>5 منصات مدعومة</li>
+          <li class="muted">Priority Support</li>
+          <li class="muted">Team Access</li>
+        </ul>
+        <button class="plan-btn ghost" onclick="openModal(event)">ابدأ دلوقتي</button>
+      </div>
+
+      <!-- GROWTH (FEATURED) -->
+      <div class="plan-card featured" style="order:2;">
+        <div class="plan-badge">⭐ الأكثر طلباً</div>
+        <div class="plan-name">Growth</div>
+        <div class="plan-price" dir="ltr" style="justify-content:flex-end;">
+          <span class="plan-amt">69</span>
+          <span class="plan-cur" style="font-size:24px;color:var(--gold);font-weight:700;margin-bottom:10px;">$</span>
+        </div>
+        <div class="plan-period">/ شهرياً · 3 مشاريع</div>
+        <div class="plan-tagline">للفريلانسر النشيط والأجنسي الصغيرة — 3 كلايانتس في نفس الوقت.</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>3 مشاريع</li>
+          <li>GTM Container Export</li>
+          <li>DataLayer Code</li>
+          <li>JSON Config</li>
+          <li>Implementation Guide</li>
+          <li>5 منصات مدعومة</li>
+          <li>Priority Support</li>
+          <li class="muted">Team Access</li>
+        </ul>
+        <button class="plan-btn primary" onclick="openModal(event)">ابدأ دلوقتي</button>
+      </div>
+
+      <!-- ENTERPRISE -->
+      <div class="plan-card" style="order:1;">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price" style="flex-direction:column;align-items:flex-start;gap:0;">
+          <span style="font-size:32px;font-weight:900;color:var(--wht);font-family:'Cairo',sans-serif;">Custom</span>
+        </div>
+        <div class="plan-period">اتكلم مع Sales</div>
+        <div class="plan-tagline">للأجنسيز الكبيرة اللي محتاجة مشاريع غير محدودة وـ white-label.</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>مشاريع غير محدودة</li>
+          <li>GTM Container Export</li>
+          <li>DataLayer Code</li>
+          <li>JSON Config</li>
+          <li>Implementation Guide</li>
+          <li>5 منصات مدعومة</li>
+          <li>Priority Support</li>
+          <li>Team Access</li>
+        </ul>
+        <button class="plan-btn enterprise" onclick="openSales()">تكلم مع Sales →</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA BANNER -->
+<section>
+  <div class="section-inner">
+    <div class="cta-banner">
+      <div class="cta-banner-inner">
+        <h2 class="cta-title">جاهز تعمل <em>Pixel Setup صح</em><br>من أول مرة؟</h2>
+        <p class="cta-sub">انضم لـ freelancers وأجنسيز بتستخدم Easy Track عشان توفر وقتها وتقدم شغل أحسن.</p>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+          <a href="#" class="btn-primary" onclick="openModal(event)">🚀 ابدأ دلوقتي</a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Easy Track · Pixel Config Generator</div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">Privacy</a>
+    <a href="#" class="footer-link">Terms</a>
+    <a href="https://linkedin.com/in/youssef-elsouly" target="_blank" class="footer-link">LinkedIn</a>
+  </div>
+  <div class="footer-copy">© 2026 Easy Track · Built by Youssef Elsouly · Easy Track</div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-wrapper">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal">
+      <h2 class="modal-title">أهلاً بيك في Easy Track 👋</h2>
+      <p class="modal-sub">سجّل حسابك وابدأ تولّد Pixel Configs احترافية في دقيقتين.</p>
+
+      <div class="modal-tabs">
+        <button class="modal-tab on" onclick="switchTab('signup',this)">حساب جديد</button>
+        <button class="modal-tab" onclick="switchTab('login',this)">تسجيل دخول</button>
+      </div>
+
+      <!-- SIGNUP -->
+      <div id="tab-signup">
+        <div class="modal-form">
+          <input class="modal-input" type="text" placeholder="الاسم الكريم" dir="rtl">
+          <input class="modal-input" type="email" placeholder="البريد الإلكتروني" dir="ltr" style="text-align:right">
+          <input class="modal-input" type="password" placeholder="كلمة المرور" dir="ltr" style="text-align:right">
+          <button class="modal-btn" onclick="handleAuth()">إنشاء حساب ←</button>
+        </div>
+        <div class="modal-divider" style="margin-top:20px;">أو</div>
+        <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--mut);">
+          عندك حساب؟ <a href="#" style="color:var(--gold);text-decoration:none;" onclick="switchTabDirect('login')">سجّل دخول</a>
+        </div>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="tab-login" style="display:none;">
+        <div class="modal-form">
+          <input class="modal-input" type="email" placeholder="البريد الإلكتروني" dir="ltr" style="text-align:right">
+          <input class="modal-input" type="password" placeholder="كلمة المرور" dir="ltr" style="text-align:right">
+          <button class="modal-btn" onclick="handleAuth()">دخول ←</button>
+        </div>
+        <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--mut);">
+          مش عندك حساب؟ <a href="#" style="color:var(--gold);text-decoration:none;" onclick="switchTabDirect('signup')">سجّل جديد</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Splash dismiss ── */
+(function() {
+  var splash = document.getElementById('et-splash');
+  if (!splash) return;
+  // After 2.4s → add .done class → CSS transition hides it → then remove from DOM
+  setTimeout(function() {
+    splash.classList.add('done');
+    setTimeout(function() {
+      splash.style.display = 'none';
+    }, 750);
+  }, 2400);
+})();
+
+function openModal(e) {
+  if(e) e.preventDefault();
+  document.getElementById('authModal').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('authModal').classList.remove('on');
+  document.body.style.overflow = '';
+}
+document.getElementById('authModal').addEventListener('click', function(e) {
+  if(e.target === this) closeModal();
+});
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.modal-tab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('tab-signup').style.display = id === 'signup' ? 'block' : 'none';
+  document.getElementById('tab-login').style.display  = id === 'login'  ? 'block' : 'none';
+}
+function switchTabDirect(id) {
+  var btn = id === 'signup'
+    ? document.querySelectorAll('.modal-tab')[0]
+    : document.querySelectorAll('.modal-tab')[1];
+  switchTab(id, btn);
+}
+
+// ═══════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════
+var SB_URL = "https://itrzwmhwqplkjunbonov.supabase.co";
+var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cnp3bWh3cXBsa2p1bmJvbm92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyODc1OTQsImV4cCI6MjA4ODg2MzU5NH0.U_yTG7gP8XIdbImhmKLbHJ2UML86tk3Hl_-0252m-bE";
+
+async function sbPost(table, data) {
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/' + table, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json', 'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(data)
+    });
+    var txt = await res.text();
+    return { ok: res.ok || res.status === 409, status: res.status, data: txt ? JSON.parse(txt) : null };
+  } catch(e) { return { ok: false, err: e.message }; }
+}
+
+async function sbGet(table, filter) {
+  try {
+    var url = SB_URL + '/rest/v1/' + table + '?select=*' + (filter ? '&' + filter : '');
+    var res = await fetch(url, {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var txt = await res.text();
+    return txt ? JSON.parse(txt) : [];
+  } catch(e) { return []; }
+}
+
+async function getCount() {
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/clients?select=id', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+        'Prefer': 'count=exact', 'Range': '0-0' }
+    });
+    var r = res.headers.get('content-range');
+    return r ? parseInt(r.split('/')[1]) : 47;
+  } catch(e) { return 47; }
+}
+
+// Update subscriber count from real DB
+getCount().then(function(n) {
+  var el = document.getElementById('subCount');
+  if (el) el.textContent = n;
+  // Live update every 30s
+  setInterval(async function() {
+    var n2 = await getCount();
+    if (el) el.textContent = n2;
+  }, 30000);
+});
+
+async function handleAuth() {
+  var isSignup = !document.getElementById('tab-login').classList.contains('active');
+  
+  // Get fields from active tab
+  var nameEl  = document.querySelector('#tab-signup input[type="text"], #tab-signup input[placeholder*="اسم"]');
+  var emailEl = document.querySelector('.modal input[type="email"]');
+  var passEl  = document.querySelector('.modal input[type="password"]');
+  
+  if (isSignup) {
+    var name  = nameEl ? nameEl.value.trim() : '';
+    var email = emailEl ? emailEl.value.trim() : '';
+    if (!name || !email) { showAuthErr('من فضلك ادخل الاسم والبريد الإلكتروني'); return; }
+    if (!email.includes('@')) { showAuthErr('البريد الإلكتروني مش صح'); return; }
+    
+    setAuthLoading(true, 'جاري إنشاء حسابك...');
+    
+    // Check if email exists first
+    var existing = await sbGet('clients', 'email=eq.' + encodeURIComponent(email));
+    var user;
+    
+    if (existing && existing.length > 0) {
+      user = existing[0];
+    } else {
+      var result = await sbPost('clients', {
+        name: name, email: email, plan: 'Basic',
+        status: 'trial', revenue: 29, projects_used: 0
+      });
+      if (result.status === 409 || result.ok) {
+        var check = await sbGet('clients', 'email=eq.' + encodeURIComponent(email));
+        user = check && check[0] ? check[0] : { name, email, plan: 'Basic', status: 'trial', projects_used: 0 };
+      } else {
+        setAuthLoading(false);
+        showAuthErr('مشكلة في التسجيل، حاول تاني');
+        return;
+      }
+    }
+    
+    // Save user to localStorage
+    localStorage.setItem('et_user', JSON.stringify({
+      id: user.id, name: user.name || name,
+      email: user.email || email, plan: user.plan || 'Basic',
+      status: user.status || 'trial', projects_used: user.projects_used || 0
+    }));
+    
+    setAuthLoading(false);
+    closeModal();
+    window.location.href = 'tool.html';
+    
+  } else {
+    // Login
+    var email = emailEl ? emailEl.value.trim() : '';
+    if (!email) { showAuthErr('ادخل البريد الإلكتروني'); return; }
+    
+    setAuthLoading(true, 'جاري تسجيل الدخول...');
+    var users = await sbGet('clients', 'email=eq.' + encodeURIComponent(email));
+    
+    if (users && users.length > 0) {
+      var user = users[0];
+      localStorage.setItem('et_user', JSON.stringify({
+        id: user.id, name: user.name, email: user.email,
+        plan: user.plan || 'Basic', status: user.status || 'active',
+        projects_used: user.projects_used || 0
+      }));
+      setAuthLoading(false);
+      closeModal();
+      // Admin check
+      if (user.email && user.email.toLowerCase().includes('admin')) {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'tool.html';
+      }
+    } else {
+      setAuthLoading(false);
+      showAuthErr('الإيميل ده مش موجود — سجّل حساب جديد');
+    }
+  }
+}
+
+function showAuthErr(msg) {
+  var err = document.getElementById('authErr');
+  if (!err) {
+    err = document.createElement('div');
+    err.id = 'authErr';
+    err.style.cssText = 'color:#f87171;font-size:13px;margin-top:10px;text-align:center;padding:8px;background:rgba(248,113,113,.08);border-radius:8px;border:1px solid rgba(248,113,113,.2);';
+    var btn = document.querySelector('.modal-btn');
+    if (btn) btn.parentNode.insertBefore(err, btn.nextSibling);
+  }
+  err.textContent = msg;
+  err.style.display = 'block';
+}
+
+function setAuthLoading(on, msg) {
+  var btn = document.querySelector('.modal-btn');
+  if (!btn) return;
+  if (on) { btn.disabled = true; btn.textContent = msg || '⏳ ...'; }
+  else { btn.disabled = false; btn.textContent = 'متابعة ←'; }
+  var err = document.getElementById('authErr');
+  if (err) err.style.display = 'none';
+}
+
+function openSales() {
+  window.open('https://linkedin.com/in/youssef-elsouly', '_blank');
+}
+
+// Subscriber count loaded via Supabase above
+
+// Scroll reveal
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if(entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.step-card, .feat-card, .plan-card, .aud-card').forEach(function(el) {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity .6s ease, transform .6s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>

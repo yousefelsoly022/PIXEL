@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easy Track — Pixel Config Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060d18; --sur:#0b1628; --sur2:#0f1e35;
+  --gold:#e8b84b; --gdim:rgba(232,184,75,0.12); --gglow:rgba(232,184,75,0.25);
+  --wht:#f0f4ff; --mut:#5a7090; --mut2:#3a5070;
+  --grn:#34d399; --red:#f87171; --blu:#60a5fa;
+  --bdr:rgba(232,184,75,0.1); --bdr2:rgba(255,255,255,0.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--wht);font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 20% 0%,rgba(232,184,75,.06),transparent 60%),
+             radial-gradient(ellipse 60% 40% at 80% 100%,rgba(96,165,250,.04),transparent 50%);
+  pointer-events:none;}
+body::after{content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;}
+.app{position:relative;z-index:1;}
+
+/* GATE */
+#gate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;}
+#gate::before{content:'';position:absolute;inset:0;background:rgba(4,8,16,.92);backdrop-filter:blur(20px);pointer-events:none;}
+.gbox{position:relative;z-index:10;background:var(--sur);border:1px solid rgba(232,184,75,.2);border-radius:24px;padding:48px 40px;max-width:480px;width:100%;box-shadow:0 40px 80px rgba(0,0,0,.6);animation:gin .5s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes gin{from{opacity:0;transform:scale(.9) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.geyebrow{display:flex;align-items:center;gap:8px;margin-bottom:24px;}
+.gdot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+.geyebrow span{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.gtitle{font-size:26px;font-weight:900;line-height:1.25;margin-bottom:10px;}
+.gtitle em{font-style:normal;color:var(--gold);}
+.gsub{color:var(--mut);font-size:13.5px;line-height:1.75;margin-bottom:32px;}
+.fgroup{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.fwrap{position:relative;}
+.ficon{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--mut2);font-size:16px;pointer-events:none;transition:color .2s;}
+.finput{width:100%;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 44px 14px 16px;color:var(--wht);font-family:'Cairo',sans-serif;font-size:14px;outline:none;transition:all .2s;direction:rtl;}
+.finput[type=tel]{direction:ltr;text-align:right;}
+.finput:focus{border-color:rgba(232,184,75,.5);background:rgba(232,184,75,.04);box-shadow:0 0 0 4px rgba(232,184,75,.08);}
+.finput:focus + .ficon{color:var(--gold);}
+.finput::placeholder{color:var(--mut2);}
+.gerr{display:none;color:var(--red);font-size:12px;margin-bottom:10px;padding:10px 14px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;}
+.gcta{width:100%;background:linear-gradient(135deg,var(--gold),#c8922a);color:#0a1520;border:none;border-radius:14px;padding:16px 24px;font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.gcta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(232,184,75,.35);}
+.gfoot{margin-top:24px;padding-top:20px;border-top:1px solid var(--bdr2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.gli{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--mut);font-size:12.5px;transition:color .2s;}
+.gli:hover{color:var(--blu);}
+.gli svg{width:18px;height:18px;fill:#0A66C2;}
+.gpriv{font-size:11px;color:var(--mut2);}
+
+/* MAIN */
+.main{max-width:900px;margin:0 auto;padding:60px 24px 100px;}
+.hdr{text-align:center;margin-bottom:64px;}
+.hbadge{display:inline-flex;align-items:center;gap:8px;background:var(--gdim);border:1px solid rgba(232,184,75,.2);border-radius:100px;padding:6px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
+.hbdot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+.hdr h1{font-size:clamp(28px,5vw,44px);font-weight:900;line-height:1.15;margin-bottom:14px;}
+.hdr h1 em{font-style:normal;color:var(--gold);}
+.hdr p{color:var(--mut);font-size:15px;max-width:500px;margin:0 auto;line-height:1.7;}
+
+/* PROGRESS */
+.ptrack{display:flex;align-items:center;justify-content:center;margin-bottom:48px;}
+.pstep{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.pcirc{width:40px;height:40px;border-radius:50%;border:2px solid var(--mut2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--mut);background:var(--bg);transition:all .4s;position:relative;z-index:1;}
+.pcirc.on{border-color:var(--gold);color:var(--gold);background:var(--gdim);box-shadow:0 0 0 4px rgba(232,184,75,.1),0 0 20px rgba(232,184,75,.2);}
+.pcirc.done{border-color:var(--grn);background:var(--grn);color:#060d18;font-size:16px;}
+.plbl{font-size:11px;color:var(--mut);transition:color .3s;white-space:nowrap;}
+.plbl.on{color:var(--gold);font-weight:700;}
+.pcon{flex:1;height:2px;max-width:80px;min-width:30px;background:var(--mut2);margin-bottom:28px;transition:background .4s;position:relative;}
+.pcon::after{content:'';position:absolute;inset:0;background:var(--grn);transform:scaleX(0);transform-origin:left;transition:transform .5s ease;}
+.pcon.done::after{transform:scaleX(1);}
+
+/* PANELS */
+.panel{background:var(--sur);border:1px solid var(--bdr2);border-radius:20px;padding:36px;display:none;animation:pin .35s ease;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.panel.on{display:block;}
+@keyframes pin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.phdr{margin-bottom:28px;}
+.pnum{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.pnum::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(232,184,75,.3),transparent);}
+.ptitle{font-size:20px;font-weight:900;margin-bottom:4px;}
+.psub{color:var(--mut);font-size:13.5px;line-height:1.6;}
+
+/* CHOICE GRID */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;}
+.cbtn{background:rgba(255,255,255,.025);border:1.5px solid rgba(255,255,255,.07);border-radius:14px;padding:20px 14px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--wht);font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;user-select:none;position:relative;overflow:hidden;}
+.cbtn:hover{border-color:rgba(232,184,75,.3);transform:translateY(-3px);}
+.cbtn.on{border-color:var(--gold);background:var(--gdim);color:var(--gold);box-shadow:0 0 0 1px rgba(232,184,75,.15),0 8px 24px rgba(232,184,75,.1);}
+.cicon{font-size:30px;line-height:1;}
+.cchk{position:absolute;top:8px;left:8px;width:18px;height:18px;border-radius:50%;background:var(--grn);color:#060d18;font-size:10px;display:none;align-items:center;justify-content:center;font-weight:900;}
+.cbtn.on .cchk{display:flex;}
+.ptags{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;}
+.ptag{font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,.06);color:var(--mut);font-family:'JetBrains Mono',monospace;}
+
+/* PIXEL INPUTS */
+.pixtabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.pixtab{padding:7px 18px;border-radius:100px;border:1.5px solid rgba(255,255,255,.08);background:transparent;color:var(--mut);font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.pixtab.on{border-color:var(--gold);color:var(--gold);background:var(--gdim);}
+.pixwrap{display:none;}
+.pixwrap.on{display:block;}
+.pixfield{width:100%;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:15px 20px;color:var(--wht);font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;transition:all .2s;direction:ltr;}
+.pixfield:focus{border-color:rgba(232,184,75,.5);box-shadow:0 0 0 4px rgba(232,184,75,.08);}
+.pixfield::placeholder{color:var(--mut2);font-size:13px;}
+.pixhint{margin-top:8px;font-size:12px;color:var(--mut);}
+
+/* ACTIONS */
+.pacts{display:flex;gap:10px;justify-content:flex-end;margin-top:32px;padding-top:24px;border-top:1px solid var(--bdr2);flex-wrap:wrap;}
+.bbk{background:transparent;color:var(--mut);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 24px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;}
+.bbk:hover{border-color:rgba(255,255,255,.2);color:var(--wht);}
+.bnxt{background:linear-gradient(135deg,var(--gold),#c8922a);color:#0a1520;border:none;border-radius:12px;padding:12px 32px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;cursor:pointer;transition:all .25s;}
+.bnxt:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,184,75,.3);}
+.bnxt:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
+.bgen{background:linear-gradient(135deg,#34d399,#059669);color:#060d18;border:none;border-radius:12px;padding:14px 36px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:10px;}
+.bgen:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(52,211,153,.3);}
+
+/* OUTPUT */
+.outwrap{display:none;}
+.outwrap.on{display:block;}
+.sumstrip{background:linear-gradient(135deg,rgba(232,184,75,.08),rgba(52,211,153,.04));border:1px solid rgba(232,184,75,.15);border-radius:16px;padding:20px 24px;margin-bottom:24px;display:flex;flex-wrap:wrap;gap:24px;align-items:center;}
+.sitem{display:flex;flex-direction:column;gap:3px;}
+.slbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;}
+.sval{font-size:15px;font-weight:700;color:var(--gold);}
+.sval.g{color:var(--grn);}
+.otabs{display:flex;gap:4px;background:rgba(0,0,0,.4);border:1px solid var(--bdr2);padding:5px;border-radius:14px;margin-bottom:20px;overflow-x:auto;}
+.otab{padding:9px 20px;border-radius:10px;border:none;background:transparent;color:var(--mut);font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.otab.on{background:var(--sur2);color:var(--wht);box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.opane{display:none;}
+.opane.on{display:block;animation:pin .3s ease;}
+.cwrap{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.06);border-radius:14px;overflow:hidden;}
+.ctbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.05);}
+.ctdots{display:flex;gap:6px;}
+.ctdot{width:12px;height:12px;border-radius:50%;}
+.clang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);}
+.ctacts{display:flex;gap:6px;}
+.cpybtn{background:rgba(232,184,75,.1);border:1px solid rgba(232,184,75,.2);color:var(--gold);border-radius:7px;padding:5px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.cpybtn:hover{background:rgba(232,184,75,.2);}
+.dlbtn{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--grn);border-radius:7px;padding:5px 14px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.dlbtn:hover{background:rgba(52,211,153,.2);}
+.cbody{padding:20px 24px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.75;color:#9fcea0;overflow-x:auto;white-space:pre;max-height:420px;overflow-y:auto;direction:ltr;text-align:left;}
+.cbody::-webkit-scrollbar{width:6px;height:6px;}
+.cbody::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+.infonote{border-radius:12px;padding:16px 20px;margin-bottom:16px;font-size:13px;color:var(--mut);line-height:1.8;}
+.infonote.grn{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);}
+.infonote.gld{background:rgba(232,184,75,.06);border:1px solid rgba(232,184,75,.15);}
+.infonote strong{color:var(--wht);}
+.infonote code{background:rgba(232,184,75,.1);color:var(--gold);padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;}
+
+/* GUIDE */
+.gsteps{display:flex;flex-direction:column;gap:16px;}
+.gcard{background:rgba(255,255,255,.02);border:1px solid var(--bdr2);border-radius:14px;padding:22px;display:flex;gap:16px;}
+.gnum{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#c8922a);color:#0a1520;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.gtxt{}
+.gtitl{font-size:15px;font-weight:700;margin-bottom:8px;}
+.gbody{color:var(--mut);font-size:13px;line-height:1.85;}
+.gbody code{background:rgba(232,184,75,.1);color:var(--gold);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;}
+.gbody strong{color:var(--wht);}
+
+/* SCORE */
+.sctable{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px;}
+.sctable thead th{background:rgba(232,184,75,.08);color:var(--gold);padding:11px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(232,184,75,.15);}
+.sctable tbody td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+.sctable tbody tr:last-child td{border-bottom:none;}
+.sctable tbody tr:hover td{background:rgba(255,255,255,.02);}
+.evname{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7dd3a8;background:rgba(52,211,153,.08);padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.ppill{display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:100px;font-size:11px;color:var(--mut);margin:2px;}
+.sbarw{display:flex;align-items:center;gap:10px;}
+.sbar{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;max-width:80px;}
+.sfill{height:100%;border-radius:3px;}
+.sfill.h{background:var(--grn);}
+.sfill.m{background:var(--gold);}
+.sfill.l{background:var(--mut2);}
+.snum{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;min-width:30px;}
+.snum.h{color:var(--grn);}
+.snum.m{color:var(--gold);}
+.snum.l{color:var(--mut);}
+
+.resetrow{display:flex;justify-content:center;margin-top:36px;}
+.brst{background:transparent;border:1.5px solid rgba(248,113,113,.2);color:rgba(248,113,113,.6);border-radius:10px;padding:10px 28px;font-family:'Cairo',sans-serif;font-size:14px;cursor:pointer;transition:all .2s;}
+.brst:hover{border-color:var(--red);color:var(--red);}
+
+@media(max-width:640px){
+  .gbox{padding:32px 22px;}
+  .panel{padding:24px 18px;}
+  .cgrid{grid-template-columns:repeat(2,1fr);}
+  .pcon{max-width:30px;min-width:16px;}
+  .hdr h1{font-size:24px;}
+  .main{padding:40px 16px 80px;}
+}
+</style>
+
+<style>
+/* ── USER BAR ── */
+#userBar {
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 32px;
+  background:rgba(5,9,15,0.95);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(232,184,75,0.1);
+  font-family:'Cairo',sans-serif;font-size:13px;
+}
+#userBar .ub-left { display:flex;align-items:center;gap:16px; }
+#userBar .ub-logo {
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--gold, #e8b84b);letter-spacing:3px;text-decoration:none;
+  display:flex;align-items:center;gap:8px;
+}
+#userBar .ub-logo-dot {
+  width:6px;height:6px;border-radius:50%;
+  background:#e8b84b;box-shadow:0 0 8px #e8b84b;
+  animation:pulse 2s infinite;
+}
+#userBar .ub-right { display:flex;align-items:center;gap:16px; }
+#userBar .ub-name { color:#a8b8d0;font-size:13px; }
+.plan-badge {
+  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
+  letter-spacing:1.5px;padding:3px 10px;border-radius:100px;
+}
+.plan-basic    { background:rgba(168,184,208,.1);color:#a8b8d0;border:1px solid rgba(168,184,208,.2); }
+.plan-growth   { background:rgba(232,184,75,.1);color:#e8b84b;border:1px solid rgba(232,184,75,.25); }
+.plan-enterprise { background:rgba(14,207,176,.1);color:#0ecfb0;border:1px solid rgba(14,207,176,.25); }
+#projCounter {
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:#4a6080;padding:3px 10px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);border-radius:8px;
+}
+#projCounter span { color:#e8b84b; }
+.ub-logout {
+  font-size:12px;color:#4a6080;cursor:pointer;
+  background:none;border:none;font-family:'Cairo',sans-serif;
+  transition:color .2s;padding:4px 8px;border-radius:6px;
+}
+.ub-logout:hover { color:#f87171; }
+.ub-admin-link {
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:rgba(232,184,75,.4);text-decoration:none;letter-spacing:1px;
+  padding:3px 8px;border:1px solid rgba(232,184,75,.15);border-radius:6px;
+  transition:all .2s;
+}
+.ub-admin-link:hover { color:#e8b84b;border-color:rgba(232,184,75,.4); }
+
+/* Plan limit banner */
+#limitBanner {
+  display:none;position:fixed;bottom:24px;right:24px;z-index:300;
+  background:#080e1a;border:1px solid rgba(232,184,75,.3);
+  border-radius:14px;padding:16px 20px;max-width:280px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+#limitBanner h4 { font-size:13px;font-weight:900;margin-bottom:6px;color:#e8b84b; }
+#limitBanner p  { font-size:12px;color:#a8b8d0;line-height:1.6;margin-bottom:12px; }
+#limitBanner button {
+  background:linear-gradient(135deg,#e8b84b,#c8962a);
+  color:#05090f;border:none;border-radius:8px;
+  padding:8px 16px;font-family:'Cairo',sans-serif;
+  font-size:12px;font-weight:900;cursor:pointer;width:100%;
+}
+#limitBanner .lb-close {
+  position:absolute;top:10px;left:12px;background:none;border:none;
+  color:#4a6080;font-size:14px;cursor:pointer;width:auto;padding:0;
+}
+
+/* Push content below userBar */
+body > *:not(#userBar) { padding-top:0; }
+#step1, .wizard, [id^="step"] { margin-top:56px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ USER BAR ═══ -->
+<div id="userBar">
+  <div class="ub-left">
+    <a href="index.html" class="ub-logo">
+      <div class="ub-logo-dot"></div>
+      EASY TRACK
+    </a>
+    <span id="projCounter">مشاريع: <span id="projUsed">0</span>/<span id="projMax">1</span></span>
+  </div>
+  <div class="ub-right">
+    <span id="userPlanBadge" class="plan-badge plan-basic">BASIC</span>
+    <span id="userName" class="ub-name">...</span>
+    <a href="admin.html" id="adminLink" class="ub-admin-link" style="display:none;">ADMIN ↗</a>
+    <button class="ub-logout" onclick="logout()">خروج</button>
+  </div>
+</div>
+
+<!-- Plan limit banner -->
+<div id="limitBanner">
+  <button class="lb-close" onclick="document.getElementById('limitBanner').style.display='none'">✕</button>
+  <h4>🔒 وصلت لحد الخطة</h4>
+  <p id="limitMsg">الخطة Basic بتسمح بـ 1 مشروع فقط. Upgrade عشان تولّد أكتر.</p>
+  <button onclick="window.open('index.html#pricing','_blank')">Upgrade دلوقتي ↗</button>
+</div>
+
+<div class="app">
+
+<!-- GATE -->
+<div id="gate">
+  <div class="gbox">
+    <div class="geyebrow"><div class="gdot"></div><span>Easy Track &nbsp;·&nbsp; Easy Track · Pixel Config Generator</span></div>
+    <h1 class="gtitle">احصل على <em>Pixel Setup</em> كامل<br>في دقيقتين — مجاناً</h1>
+    <p class="gsub">JSON Config + GTM Container + DataLayer Code<br>بناءً على GA4 Official Schema من Google</p>
+    <div class="fgroup">
+      <div class="fwrap">
+        <input class="finput" id="gName" type="text" placeholder="اسمك الكريم *">
+        <span class="ficon">👤</span>
+      </div>
+      <div class="fwrap">
+        <input class="finput" id="gPhone" type="tel" placeholder="واتساب / تليفون *">
+        <span class="ficon">📱</span>
+      </div>
+      <div class="fwrap">
+        <input class="finput" id="gLocation" type="text" placeholder="بلدك / مدينتك *">
+        <span class="ficon">📍</span>
+      </div>
+    </div>
+    <div class="gerr" id="gErr">⚠️ برجاء ملء جميع الحقول للمتابعة</div>
+    <button class="gcta" id="gBtn">🚀 ابدأ إعداد الـ Pixel</button>
+    <div class="gfoot">
+      <a class="gli" href="https://www.linkedin.com/in/youssef-elsouly" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Easy Track — يوسف
+      </a>
+      <div class="gpriv">🔒 بياناتك آمنة ولن تُشارك</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="hdr">
+    <div class="hbadge"><div class="hbdot"></div>Easy Track · Pixel Config Generator</div>
+    <h1>اعمل <em>Pixel Setup</em> صح<br>من أول مرة</h1>
+    <p>GA4 Official Schema · GTM Container · Multi-Platform Config</p>
+  </div>
+
+  <div class="ptrack" id="ptrack">
+    <div class="pstep"><div class="pcirc on" id="pc1">1</div><div class="plbl on" id="pl1">CMS</div></div>
+    <div class="pcon" id="pcon1"></div>
+    <div class="pstep"><div class="pcirc" id="pc2">2</div><div class="plbl" id="pl2">Platform</div></div>
+    <div class="pcon" id="pcon2"></div>
+    <div class="pstep"><div class="pcirc" id="pc3">3</div><div class="plbl" id="pl3">Events</div></div>
+    <div class="pcon" id="pcon3"></div>
+    <div class="pstep"><div class="pcirc" id="pc4">4</div><div class="plbl" id="pl4">Pixel IDs</div></div>
+    <div class="pcon" id="pcon4"></div>
+    <div class="pstep"><div class="pcirc" id="pc5">5</div><div class="plbl" id="pl5">Output</div></div>
+  </div>
+
+  <div class="panel on" id="s1">
+    <div class="phdr"><div class="pnum">Step 01</div><div class="ptitle">إيه الـ CMS بتاعك؟</div><div class="psub">اختار المنصة اللي بتشتغل عليها</div></div>
+    <div class="cgrid" id="cmsGrid">
+      <button class="cbtn" data-val="salla"><div class="cchk">✓</div><span class="cicon">🛍️</span>سلة</button>
+      <button class="cbtn" data-val="zid"><div class="cchk">✓</div><span class="cicon">⚡</span>زد</button>
+      <button class="cbtn" data-val="woocommerce"><div class="cchk">✓</div><span class="cicon">🔧</span>WooCommerce</button>
+      <button class="cbtn" data-val="shopify"><div class="cchk">✓</div><span class="cicon">🏪</span>Shopify</button>
+      <button class="cbtn" data-val="custom"><div class="cchk">✓</div><span class="cicon">💻</span>Custom Site</button>
+    </div>
+    <div class="pacts"><button class="bnxt" id="btn1" disabled onclick="goStep(2)">التالي →</button></div>
+  </div>
+
+  <div class="panel" id="s2">
+    <div class="phdr"><div class="pnum">Step 02</div><div class="ptitle">إيه المنصات اللي عايز تربطها؟</div><div class="psub">ممكن تختار أكتر من واحدة</div></div>
+    <div class="cgrid" id="platGrid">
+      <button class="cbtn" data-val="meta"><div class="cchk">✓</div><span class="cicon">📘</span>Meta</button>
+      <button class="cbtn" data-val="snapchat"><div class="cchk">✓</div><span class="cicon">👻</span>Snapchat</button>
+      <button class="cbtn" data-val="tiktok"><div class="cchk">✓</div><span class="cicon">🎵</span>TikTok</button>
+      <button class="cbtn" data-val="google"><div class="cchk">✓</div><span class="cicon">🔍</span>Google Ads</button>
+      <button class="cbtn" data-val="ga4"><div class="cchk">✓</div><span class="cicon">📊</span>GA4</button>
+      <button class="cbtn" data-val="twitter"><div class="cchk">✓</div><span class="cicon">𝕏</span>X / Twitter</button>
+    </div>
+    <div class="pacts">
+      <button class="bbk" onclick="goStep(1)">← رجوع</button>
+      <button class="bnxt" id="btn2" disabled onclick="goStep(3)">التالي →</button>
+    </div>
+  </div>
+
+  <div class="panel" id="s3">
+    <div class="phdr"><div class="pnum">Step 03</div><div class="ptitle">إيه الـ Events اللي عايز تتتبعها؟</div><div class="psub">الـ Events معتمدة من Google GA4 Recommended Events</div></div>
+    <div class="cgrid" id="evGrid"></div>
+    <div class="pacts">
+      <button class="bbk" onclick="goStep(2)">← رجوع</button>
+      <button class="bnxt" id="btn3" disabled onclick="goStep(4)">التالي →</button>
+    </div>
+  </div>
+
+  <div class="panel" id="s4">
+    <div class="phdr"><div class="pnum">Step 04</div><div class="ptitle">أدخل الـ Pixel IDs</div><div class="psub">هتلاقيه في إعدادات كل منصة</div></div>
+    <div class="pixtabs" id="pixTabs"></div>
+    <div id="pixInputs"></div>
+    <div class="pacts">
+      <button class="bbk" onclick="goStep(3)">← رجوع</button>
+      <button class="bgen" onclick="generate()"><span>⚡</span>اعمل الـ Config</button>
+    </div>
+  </div>
+
+  <div class="outwrap" id="outWrap">
+    <div class="sumstrip" id="sumStrip"></div>
+    <div class="otabs">
+      <button class="otab on" onclick="oTab('json',this)">📄 JSON Config</button>
+      <button class="otab" onclick="oTab('gtm',this)">📦 GTM Container</button>
+      <button class="otab" onclick="oTab('dl',this)">🏷️ DataLayer Code</button>
+      <button class="otab" onclick="oTab('guide',this)">📋 Guide</button>
+      <button class="otab" onclick="oTab('score',this)">⭐ Event Score</button>
+    </div>
+
+    <div class="opane on" id="pane-json">
+      <div class="cwrap">
+        <div class="ctbar">
+          <div class="ctdots"><div class="ctdot" style="background:#ff5f57"></div><div class="ctdot" style="background:#febc2e"></div><div class="ctdot" style="background:#28c840"></div></div>
+          <span class="clang">pixel-config.json</span>
+          <div class="ctacts">
+            <button class="dlbtn" id="dlJson">⬇️ تحميل</button>
+            <button class="cpybtn" id="cpyJson">نسخ</button>
+          </div>
+        </div>
+        <div class="cbody" id="jsonBody"></div>
+      </div>
+    </div>
+
+    <div class="opane" id="pane-gtm">
+      <div class="infonote grn"><strong style="color:var(--grn)">📦 GTM Container Export</strong> — استورده مباشرة في GTM:<br><strong>Admin → Import Container → اختار الملف → Merge → Confirm</strong><br><br>📌 الـ Container بيحتوي على:<br>✅ <strong>Base Code Tag</strong> لكل منصة (يتنار على كل الصفحات تلقائياً)<br>✅ <strong>Event Tags</strong> + Triggers + DataLayer Variables</div>
+      <div class="cwrap">
+        <div class="ctbar">
+          <div class="ctdots"><div class="ctdot" style="background:#ff5f57"></div><div class="ctdot" style="background:#febc2e"></div><div class="ctdot" style="background:#28c840"></div></div>
+          <span class="clang">gtm-container.json</span>
+          <div class="ctacts">
+            <button class="dlbtn" id="dlGtm">⬇️ تحميل</button>
+            <button class="cpybtn" id="cpyGtm">نسخ</button>
+          </div>
+        </div>
+        <div class="cbody" id="gtmBody"></div>
+      </div>
+    </div>
+
+    <div class="opane" id="pane-dl">
+      <div class="infonote gld"><strong style="color:var(--gold)">🏷️ DataLayer Code</strong> — حطه في الـ site مش في GTM.<br>كل event له <code>window.dataLayer.push()</code> — اكمل الـ values من الـ dynamic data.</div>
+      <div class="cwrap">
+        <div class="ctbar">
+          <div class="ctdots"><div class="ctdot" style="background:#ff5f57"></div><div class="ctdot" style="background:#febc2e"></div><div class="ctdot" style="background:#28c840"></div></div>
+          <span class="clang">datalayer.js</span>
+          <button class="cpybtn" id="cpyDl">نسخ</button>
+        </div>
+        <div class="cbody" id="dlBody"></div>
+      </div>
+    </div>
+
+    <div class="opane" id="pane-guide"><div class="gsteps" id="guideSteps"></div></div>
+    <div class="opane" id="pane-score"><div id="scoreContent"></div></div>
+
+    <div class="resetrow"><button class="brst" onclick="resetAll()">🔄 ابدأ من الأول</button></div>
+  </div>
+</div>
+</div>
+
+<script>
+// ===== STATE =====
+var S = { cms:null, platforms:[], events:[], pixelIds:{}, lead:{} };
+
+// ===== DATA =====
+var CMS = {
+  salla:       { name:'سلة',         note:'سلة بتدعم GTM Native وفيها Data Layer تلقائي' },
+  zid:         { name:'زد',          note:'زد بتدعم GTM ولديها Data Layer events جاهزة' },
+  woocommerce: { name:'WooCommerce', note:'محتاج Plugin: GTM4WP أو DataLayer WooCommerce' },
+  shopify:     { name:'Shopify',     note:'بتحتاج GTM في theme.liquid أو Elevar App' },
+  custom:      { name:'Custom Site', note:'محتاج Data Layer implementation يدوي في الكود' }
+};
+
+var GA4 = {
+  view_item:         { label:'View Product',      score:3,  req:['currency','value','items'], opt:[], ip:['item_id','item_name','item_brand','item_category','item_variant','price','quantity'] },
+  add_to_cart:       { label:'Add to Cart',       score:6,  req:['currency','value','items'], opt:[], ip:['item_id','item_name','item_brand','item_category','price','quantity'] },
+  remove_from_cart:  { label:'Remove from Cart',  score:2,  req:['currency','value','items'], opt:[], ip:['item_id','item_name','price','quantity'] },
+  view_cart:         { label:'View Cart',         score:3,  req:['currency','value','items'], opt:[], ip:['item_id','item_name','price','quantity'] },
+  begin_checkout:    { label:'Begin Checkout',    score:8,  req:['currency','value','items'], opt:['coupon'], ip:['item_id','item_name','item_brand','item_category','price','quantity'] },
+  add_shipping_info: { label:'Add Shipping Info', score:7,  req:['currency','value','shipping_tier','items'], opt:['coupon'], ip:['item_id','item_name','price','quantity'] },
+  add_payment_info:  { label:'Add Payment Info',  score:9,  req:['currency','value','payment_type','items'], opt:['coupon'], ip:['item_id','item_name','price','quantity'] },
+  purchase:          { label:'Purchase',          score:10, req:['transaction_id','currency','value','items'], opt:['affiliation','coupon','shipping','tax'], ip:['item_id','item_name','item_brand','item_category','coupon','discount','price','quantity'] },
+  refund:            { label:'Refund',            score:4,  req:['transaction_id','currency','value'], opt:['affiliation','items'], ip:['item_id','item_name','price','quantity'] },
+  search:            { label:'Search',            score:2,  req:['search_term'], opt:[], ip:[] },
+  add_to_wishlist:   { label:'Add to Wishlist',   score:4,  req:['currency','value','items'], opt:[], ip:['item_id','item_name','price','quantity'] },
+  view_item_list:    { label:'View Item List',    score:2,  req:['items'], opt:['item_list_id','item_list_name'], ip:['item_id','item_name','index','price'] },
+  select_item:       { label:'Select Item',       score:3,  req:['items'], opt:['item_list_id','item_list_name'], ip:['item_id','item_name','index','price'] },
+  sign_up:           { label:'Sign Up',           score:5,  req:['method'], opt:[], ip:[] },
+  login:             { label:'Login',             score:1,  req:['method'], opt:[], ip:[] }
+};
+
+var PMAP = {
+  meta:     { view_item:'ViewContent', add_to_cart:'AddToCart', remove_from_cart:null, view_cart:null, begin_checkout:'InitiateCheckout', add_shipping_info:null, add_payment_info:'AddPaymentInfo', purchase:'Purchase', refund:null, search:'Search', add_to_wishlist:'AddToWishlist', view_item_list:null, select_item:null, sign_up:'CompleteRegistration', login:null },
+  snapchat: { view_item:'VIEW_CONTENT', add_to_cart:'ADD_CART', remove_from_cart:null, view_cart:null, begin_checkout:'START_CHECKOUT', add_shipping_info:null, add_payment_info:'ADD_BILLING', purchase:'PURCHASE', refund:null, search:'SEARCH', add_to_wishlist:'SAVE', view_item_list:null, select_item:null, sign_up:'SIGN_UP', login:null },
+  tiktok:   { view_item:'ViewContent', add_to_cart:'AddToCart', remove_from_cart:null, view_cart:null, begin_checkout:'InitiateCheckout', add_shipping_info:null, add_payment_info:'AddPaymentInfo', purchase:'Purchase', refund:null, search:'Search', add_to_wishlist:'AddToWishlist', view_item_list:null, select_item:null, sign_up:'CompleteRegistration', login:null },
+  google:   { view_item:'view_item', add_to_cart:'add_to_cart', remove_from_cart:'remove_from_cart', view_cart:'view_cart', begin_checkout:'begin_checkout', add_shipping_info:'add_shipping_info', add_payment_info:'add_payment_info', purchase:'purchase', refund:'refund', search:'search', add_to_wishlist:'add_to_wishlist', view_item_list:'view_item_list', select_item:'select_item', sign_up:'sign_up', login:'login' },
+  twitter:  { view_item:'ViewContent', add_to_cart:'AddToCart', remove_from_cart:null, view_cart:null, begin_checkout:'InitiateCheckout', add_shipping_info:null, add_payment_info:null, purchase:'Purchase', refund:null, search:'Search', add_to_wishlist:null, view_item_list:null, select_item:null, sign_up:'SignUp', login:null }
+,
+  ga4:      { view_item:'view_item', add_to_cart:'add_to_cart', remove_from_cart:'remove_from_cart', view_cart:'view_cart', begin_checkout:'begin_checkout', add_shipping_info:'add_shipping_info', add_payment_info:'add_payment_info', purchase:'purchase', refund:'refund', search:'search', add_to_wishlist:'add_to_wishlist', view_item_list:'view_item_list', select_item:'select_item', sign_up:'sign_up', login:'login' }
+};
+
+var PM = {
+  meta:     { name:'Meta',       icon:'📘' },
+  snapchat: { name:'Snapchat',   icon:'👻' },
+  tiktok:   { name:'TikTok',     icon:'🎵' },
+  google:   { name:'Google Ads', icon:'🔍' },
+  twitter:  { name:'X/Twitter',  icon:'𝕏'  },
+  ga4:      { name:'Google Analytics 4', icon:'📊' }
+};
+
+var HINTS = {
+  meta:     'Business Manager → Events Manager → Pixel ID',
+  snapchat: 'Snap Ads Manager → Assets → Pixels',
+  tiktok:   'TikTok Ads Manager → Assets → Events',
+  google:   'Google Ads → Goals → Conversions → Conversion ID',
+  ga4:      'Google Analytics → Admin → Data Streams → Measurement ID',
+  twitter:  'X Ads Manager → Events Manager'
+};
+
+// GTM tag HTML - hardcoded per platform/event to avoid JS syntax errors
+var TAGHTML = {
+  meta: {
+    ViewContent:          "[S]\nfbq('track', 'ViewContent', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    AddToCart:            "[S]\nfbq('track', 'AddToCart', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    InitiateCheckout:     "[S]\nfbq('track', 'InitiateCheckout', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    AddPaymentInfo:       "[S]\nfbq('track', 'AddPaymentInfo', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    Purchase:             "[S]\nfbq('track', 'Purchase', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  content_type: 'product'\n});\n[/S]",
+    Search:               "[S]\nfbq('track', 'Search', {});\n[/S]",
+    AddToWishlist:        "[S]\nfbq('track', 'AddToWishlist', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    CompleteRegistration: "[S]\nfbq('track', 'CompleteRegistration', {});\n[/S]"
+  },
+  snapchat: {
+    VIEW_CONTENT:   "[S]\nsnaptr('track', 'VIEW_CONTENT', {\n  currency: '{{DL - currency}}',\n  price: {{DL - value}}\n});\n[/S]",
+    ADD_CART:       "[S]\nsnaptr('track', 'ADD_CART', {\n  currency: '{{DL - currency}}',\n  price: {{DL - value}}\n});\n[/S]",
+    START_CHECKOUT: "[S]\nsnaptr('track', 'START_CHECKOUT', {\n  currency: '{{DL - currency}}',\n  price: {{DL - value}}\n});\n[/S]",
+    ADD_BILLING:    "[S]\nsnaptr('track', 'ADD_BILLING', {\n  currency: '{{DL - currency}}',\n  price: {{DL - value}}\n});\n[/S]",
+    PURCHASE:       "[S]\nsnaptr('track', 'PURCHASE', {\n  currency: '{{DL - currency}}',\n  price: {{DL - value}},\n  transaction_id: '{{DL - transaction_id}}'\n});\n[/S]",
+    SEARCH:         "[S]\nsnaptr('track', 'SEARCH', {});\n[/S]",
+    SAVE:           "[S]\nsnaptr('track', 'SAVE', {\n  currency: '{{DL - currency}}',\n  price: {{DL - value}}\n});\n[/S]",
+    SIGN_UP:        "[S]\nsnaptr('track', 'SIGN_UP', {});\n[/S]"
+  },
+  tiktok: {
+    ViewContent:          "[S]\nttq.track('ViewContent', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    AddToCart:            "[S]\nttq.track('AddToCart', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    InitiateCheckout:     "[S]\nttq.track('InitiateCheckout', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    AddPaymentInfo:       "[S]\nttq.track('AddPaymentInfo', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    Purchase:             "[S]\nttq.track('Purchase', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    Search:               "[S]\nttq.track('Search', {});\n[/S]",
+    AddToWishlist:        "[S]\nttq.track('AddToWishlist', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    CompleteRegistration: "[S]\nttq.track('CompleteRegistration', {});\n[/S]"
+  },
+  google: {
+    view_item:         "[S]\ngtag('event', 'view_item', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    add_to_cart:       "[S]\ngtag('event', 'add_to_cart', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    remove_from_cart:  "[S]\ngtag('event', 'remove_from_cart', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    view_cart:         "[S]\ngtag('event', 'view_cart', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    begin_checkout:    "[S]\ngtag('event', 'begin_checkout', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    add_shipping_info: "[S]\ngtag('event', 'add_shipping_info', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  shipping_tier: '{{DL - shipping_tier}}'\n});\n[/S]",
+    add_payment_info:  "[S]\ngtag('event', 'add_payment_info', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  payment_type: '{{DL - payment_type}}'\n});\n[/S]",
+    purchase:          "[S]\ngtag('event', 'purchase', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  transaction_id: '{{DL - transaction_id}}'\n});\n[/S]",
+    refund:            "[S]\ngtag('event', 'refund', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  transaction_id: '{{DL - transaction_id}}'\n});\n[/S]",
+    search:            "[S]\ngtag('event', 'search', {\n  search_term: '{{DL - search_term}}'\n});\n[/S]",
+    add_to_wishlist:   "[S]\ngtag('event', 'add_to_wishlist', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    view_item_list:    "[S]\ngtag('event', 'view_item_list', {});\n[/S]",
+    select_item:       "[S]\ngtag('event', 'select_item', {});\n[/S]",
+    sign_up:           "[S]\ngtag('event', 'sign_up', {\n  method: '{{DL - method}}'\n});\n[/S]",
+    login:             "[S]\ngtag('event', 'login', {\n  method: '{{DL - method}}'\n});\n[/S]"
+  },
+  ga4: {
+    view_item:         "[S]\ngtag('event', 'view_item', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  items: {{DL - items}}\n});\n[/S]",
+    add_to_cart:       "[S]\ngtag('event', 'add_to_cart', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  items: {{DL - items}}\n});\n[/S]",
+    remove_from_cart:  "[S]\ngtag('event', 'remove_from_cart', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  items: {{DL - items}}\n});\n[/S]",
+    view_cart:         "[S]\ngtag('event', 'view_cart', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    begin_checkout:    "[S]\ngtag('event', 'begin_checkout', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  items: {{DL - items}}\n});\n[/S]",
+    add_shipping_info: "[S]\ngtag('event', 'add_shipping_info', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  shipping_tier: '{{DL - shipping_tier}}'\n});\n[/S]",
+    add_payment_info:  "[S]\ngtag('event', 'add_payment_info', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  payment_type: '{{DL - payment_type}}'\n});\n[/S]",
+    purchase:          "[S]\ngtag('event', 'purchase', {\n  transaction_id: '{{DL - transaction_id}}',\n  currency: '{{DL - currency}}',\n  value: {{DL - value}},\n  items: {{DL - items}}\n});\n[/S]",
+    refund:            "[S]\ngtag('event', 'refund', {\n  transaction_id: '{{DL - transaction_id}}',\n  currency: '{{DL - currency}}'\n});\n[/S]",
+    search:            "[S]\ngtag('event', 'search', {\n  search_term: '{{DL - search_term}}'\n});\n[/S]",
+    add_to_wishlist:   "[S]\ngtag('event', 'add_to_wishlist', {\n  currency: '{{DL - currency}}',\n  value: {{DL - value}}\n});\n[/S]",
+    view_item_list:    "[S]\ngtag('event', 'view_item_list', {\n  item_list_id: '{{DL - item_list_id}}'\n});\n[/S]",
+    select_item:       "[S]\ngtag('event', 'select_item', {\n  items: {{DL - items}}\n});\n[/S]",
+    sign_up:           "[S]\ngtag('event', 'sign_up', {\n  method: '{{DL - method}}'\n});\n[/S]",
+    login:             "[S]\ngtag('event', 'login', {\n  method: '{{DL - method}}'\n});\n[/S]"
+  },
+  twitter: {
+    ViewContent:     "[S]\ntwq('event', 'tw-ViewContent', {\n  value: {{DL - value}},\n  currency: '{{DL - currency}}'\n});\n[/S]",
+    AddToCart:       "[S]\ntwq('event', 'tw-AddToCart', {\n  value: {{DL - value}},\n  currency: '{{DL - currency}}'\n});\n[/S]",
+    InitiateCheckout:"[S]\ntwq('event', 'tw-InitiateCheckout', {\n  value: {{DL - value}},\n  currency: '{{DL - currency}}'\n});\n[/S]",
+    Purchase:        "[S]\ntwq('event', 'tw-Purchase', {\n  value: {{DL - value}},\n  currency: '{{DL - currency}}',\n  conversion_id: '{{DL - transaction_id}}'\n});\n[/S]",
+    Search:          "[S]\ntwq('event', 'tw-Search', {});\n[/S]",
+    SignUp:          "[S]\ntwq('event', 'tw-SignUp', {});\n[/S]"
+  }
+};
+
+// ===== GATE =====
+document.getElementById('gBtn').onclick = function() {
+  var n = document.getElementById('gName').value.trim();
+  var p = document.getElementById('gPhone').value.trim();
+  var l = document.getElementById('gLocation').value.trim();
+  if (!n || !p || !l) { document.getElementById('gErr').style.display = 'block'; return; }
+  document.getElementById('gErr').style.display = 'none';
+  S.lead = { name:n, phone:p, location:l, ts: new Date().toISOString() };
+  var g = document.getElementById('gate');
+  g.style.transition = 'opacity .4s';
+  g.style.opacity = '0';
+  setTimeout(function() { g.style.display = 'none'; }, 400);
+};
+
+// ===== CMS GRID =====
+var cmsGrid = document.getElementById('cmsGrid');
+cmsGrid.onclick = function(e) {
+  var btn = e.target;
+  while (btn && btn.tagName !== 'BUTTON') btn = btn.parentElement;
+  if (!btn) return;
+  var val = btn.getAttribute('data-val');
+  if (!val) return;
+  S.cms = val;
+  var btns = cmsGrid.querySelectorAll('.cbtn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
+  btn.classList.add('on');
+  document.getElementById('btn1').disabled = false;
+};
+
+// ===== PLATFORM GRID =====
+var platGrid = document.getElementById('platGrid');
+platGrid.onclick = function(e) {
+  var btn = e.target;
+  while (btn && btn.tagName !== 'BUTTON') btn = btn.parentElement;
+  if (!btn) return;
+  var val = btn.getAttribute('data-val');
+  if (!val) return;
+  var idx = S.platforms.indexOf(val);
+  if (idx === -1) { S.platforms.push(val); btn.classList.add('on'); }
+  else { S.platforms.splice(idx, 1); btn.classList.remove('on'); }
+  document.getElementById('btn2').disabled = S.platforms.length === 0;
+};
+
+// ===== STEP NAVIGATION =====
+function goStep(n) {
+  if (n === 3) buildEvGrid();
+  if (n === 4) buildPixInputs();
+  for (var i = 1; i <= 4; i++) {
+    document.getElementById('s'+i).classList.remove('on');
+  }
+  document.getElementById('outWrap').classList.remove('on');
+  if (n <= 4) document.getElementById('s'+n).classList.add('on');
+  updateProg(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProg(cur) {
+  for (var i = 1; i <= 5; i++) {
+    var c = document.getElementById('pc'+i);
+    var l = document.getElementById('pl'+i);
+    c.classList.remove('on','done');
+    l.classList.remove('on');
+    if (i < cur)      { c.classList.add('done'); c.textContent = '✓'; }
+    else if (i === cur){ c.classList.add('on'); c.textContent = i; l.classList.add('on'); }
+    else               { c.textContent = i; }
+    if (i <= 4) {
+      var con = document.getElementById('pcon'+i);
+      if (i < cur) con.classList.add('done');
+      else con.classList.remove('done');
+    }
+  }
+}
+
+// ===== EVENTS GRID =====
+function buildEvGrid() {
+  S.events = [];
+  var grid = document.getElementById('evGrid');
+  grid.innerHTML = '';
+  var keys = Object.keys(GA4);
+  for (var ki = 0; ki < keys.length; ki++) {
+    var id = keys[ki];
+    var ev = GA4[id];
+    var supported = [];
+    for (var pi = 0; pi < S.platforms.length; pi++) {
+      if (PMAP[S.platforms[pi]][id] != null) supported.push(S.platforms[pi]);
+    }
+    if (!supported.length) continue;
+    var isForced = (id === 'purchase');
+    if (isForced) S.events.push(id);
+    var tags = '';
+    for (var si = 0; si < supported.length; si++) {
+      tags += '<span class="ptag">' + PM[supported[si]].icon + '</span>';
+    }
+    var btn = document.createElement('button');
+    btn.className = 'cbtn' + (isForced ? ' on' : '');
+    btn.setAttribute('data-evid', id);
+    if (isForced) { btn.style.opacity = '.8'; btn.style.cursor = 'default'; btn.setAttribute('data-forced','1'); }
+    btn.innerHTML = '<div class="cchk">✓</div><div class="ptags">' + tags + '</div>'
+      + '<span style="font-size:13px;font-weight:700">' + ev.label + '</span>'
+      + '<span style="font-family:monospace;font-size:9px;color:var(--mut)">GA4</span>';
+    grid.appendChild(btn);
+  }
+  grid.onclick = function(e) {
+    var btn = e.target;
+    while (btn && btn.tagName !== 'BUTTON') btn = btn.parentElement;
+    if (!btn || btn.getAttribute('data-forced')) return;
+    var eid = btn.getAttribute('data-evid');
+    if (!eid) return;
+    var idx = S.events.indexOf(eid);
+    if (idx === -1) { S.events.push(eid); btn.classList.add('on'); }
+    else { S.events.splice(idx, 1); btn.classList.remove('on'); }
+    document.getElementById('btn3').disabled = S.events.length === 0;
+  };
+  document.getElementById('btn3').disabled = S.events.length === 0;
+}
+
+// ===== PIXEL INPUTS =====
+function buildPixInputs() {
+  var tabs = document.getElementById('pixTabs');
+  var inputs = document.getElementById('pixInputs');
+  tabs.innerHTML = '';
+  inputs.innerHTML = '';
+  for (var i = 0; i < S.platforms.length; i++) {
+    var p = S.platforms[i];
+    var pm = PM[p];
+    var tab = document.createElement('button');
+    tab.className = 'pixtab' + (i === 0 ? ' on' : '');
+    tab.textContent = pm.name;
+    tab.setAttribute('data-plat', p);
+    tabs.appendChild(tab);
+    var wrap = document.createElement('div');
+    wrap.className = 'pixwrap' + (i === 0 ? ' on' : '');
+    wrap.id = 'pw-' + p;
+    wrap.innerHTML = '<input class="pixfield" id="pf-' + p + '" type="text" placeholder="' + pm.name + ' Pixel ID" dir="ltr">'
+      + '<div class="pixhint">💡 ' + HINTS[p] + '</div>';
+    inputs.appendChild(wrap);
+  }
+  tabs.onclick = function(e) {
+    var btn = e.target;
+    if (btn.tagName !== 'BUTTON') return;
+    var plat = btn.getAttribute('data-plat');
+    var allTabs = tabs.querySelectorAll('.pixtab');
+    var allWraps = inputs.querySelectorAll('.pixwrap');
+    for (var i = 0; i < allTabs.length; i++) allTabs[i].classList.remove('on');
+    for (var i = 0; i < allWraps.length; i++) allWraps[i].classList.remove('on');
+    btn.classList.add('on');
+    var pw = document.getElementById('pw-' + plat);
+    if (pw) pw.classList.add('on');
+  };
+}
+
+// ===== GENERATE =====
+function generate() {
+  try {
+  for (var i = 0; i < S.platforms.length; i++) {
+    var p = S.platforms[i];
+    var el = document.getElementById('pf-' + p);
+    S.pixelIds[p] = el ? el.value.trim() : '';
+  }
+  document.getElementById('jsonBody').textContent = JSON.stringify(buildJSON(), null, 2);
+  document.getElementById('gtmBody').textContent  = JSON.stringify(buildGTMContainer(), null, 2);
+  document.getElementById('dlBody').textContent   = buildDL();
+  document.getElementById('guideSteps').innerHTML = buildGuide();
+  document.getElementById('scoreContent').innerHTML = buildScore();
+  buildSummary();
+  for (var i = 1; i <= 4; i++) document.getElementById('s'+i).classList.remove('on');
+  document.getElementById('outWrap').classList.add('on');
+  updateProg(5);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  bindDownloads();
+  } catch(e) { console.error('generate() error:', e); }
+}
+
+// ===== BUILD JSON =====
+function buildJSON() {
+  var platforms = {};
+  for (var pi = 0; pi < S.platforms.length; pi++) {
+    var p = S.platforms[pi];
+    var evList = [];
+
+
+    for (var ei = 0; ei < S.events.length; ei++) {
+      var evId = S.events[ei];
+      var ev = GA4[evId];
+      var platEv = PMAP[p][evId];
+      if (!platEv) continue;
+      var params = {};
+      for (var ri = 0; ri < ev.req.length; ri++) {
+        var r = ev.req[ri];
+        if (r === 'items') {
+          var item = {};
+          for (var ii = 0; ii < ev.ip.length; ii++) item[ev.ip[ii]] = '{{' + ev.ip[ii] + '}}';
+          params[r] = [item];
+        } else {
+          params[r] = '{{' + r + '}}';
+        }
+      }
+      for (var oi = 0; oi < ev.opt.length; oi++) params[ev.opt[oi]] = '{{' + ev.opt[oi] + '}}';
+      evList.push({ ga4_event:evId, platform_event:platEv, label:ev.label, event_score:ev.score, parameters:params });
+    }
+    platforms[p] = { platform_name:PM[p].name, pixel_id:S.pixelIds[p]||'YOUR_PIXEL_ID', events:evList };
+  }
+  return {
+    generated_by: 'Easy Track Easy Track · Pixel Config Generator',
+    schema_source: 'GA4 Recommended Events — developers.google.com/analytics/devguides/collection/ga4/reference/events',
+    generated_at: new Date().toISOString().split('T')[0],
+    lead: S.lead, cms: S.cms, cms_name: CMS[S.cms].name, cms_notes: CMS[S.cms].note,
+    platforms: platforms
+  };
+}
+
+// ===== BUILD GTM CONTAINER =====
+function buildGTMContainer() {
+  var ts = String(Date.now());
+  var d = new Date();
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  var now = d.getUTCFullYear() + '-' + pad(d.getUTCMonth()+1) + '-' + pad(d.getUTCDate())
+    + ' ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds());
+
+  var tags = [], triggers = [], variables = [];
+  var tagId = 1, trigId = 100, varId = 200;
+  var trigMap = {};
+
+  // ---- ALL PAGES TRIGGER ----
+  // GTM built-in "All Pages" trigger has ID 2147479553
+  // We use it directly for base code tags
+  var allPagesTrigId = '2147479553';
+
+  var dlKeys = ['currency','value','transaction_id','affiliation','coupon','shipping','tax','payment_type','search_term','shipping_tier','method','items'];
+  for (var vi = 0; vi < dlKeys.length; vi++) {
+    variables.push({
+      accountId:'000000000', containerId:'00000000', variableId:String(varId),
+      name:'DL - ' + dlKeys[vi], type:'v',
+      parameter:[
+        {type:'INTEGER',key:'dataLayerVersion',value:'2'},
+        {type:'BOOLEAN',key:'setDefaultValue',value:'false'},
+        {type:'TEMPLATE',key:'name',value:'ecommerce.' + dlKeys[vi]}
+      ],
+      fingerprint: String(Date.now() + varId)
+    });
+    varId++;
+  }
+
+  // ---- BASE CODE TAGS (All Pages) ----
+  var BASE = {
+    meta: '<!-- Meta Pixel Base Code -->\n[S]\n!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version=\'2.0\';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,\'script\',\'https://connect.facebook.net/en_US/fbevents.js\');\nfbq(\'init\', \'PIXEL_ID\');\nfbq(\'track\', \'PageView\');\n[/S]\n<!-- End Meta Pixel Base Code -->',
+    snapchat: '<!-- Snap Pixel Base Code -->\n[S]\n(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s=\'script\';r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u);})(window,document,\'https://sc-static.net/scevent.min.js\');\nsnaptr(\'init\', \'PIXEL_ID\', {});\nsnaptr(\'track\', \'PAGE_VIEW\');\n[/S]\n<!-- End Snap Pixel Base Code -->',
+    tiktok: '<!-- TikTok Pixel Base Code -->\n[S]\n!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=[\'page\',\'track\',\'identify\',\'instances\',\'debug\',\'on\',\'off\',\'once\',\'ready\',\'alias\',\'group\',\'enableCookie\',\'disableCookie\'];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};ttq.load=function(e,n){var i=\'https://analytics.tiktok.com/i18n/pixel/events.js\';ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=i;var o=d.createElement(\'script\');o.type=\'text/javascript\';o.async=!0;o.src=i+\'?sdkid=\'+e;var a=d.getElementsByTagName(\'script\')[0];a.parentNode.insertBefore(o,a)};ttq.load(\'PIXEL_ID\');ttq.page();}(window,document,\'ttq\');\n[/S]\n<!-- End TikTok Pixel Base Code -->',
+    google: '<!-- Google Ads Base Code -->\n[S]\nwindow.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag(\'js\',new Date());gtag(\'config\',\'PIXEL_ID\');\n[/S]\n<!-- End Google Ads Base Code -->',
+    twitter: '<!-- X (Twitter) Pixel Base Code -->\n[S]\n!function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments)};s.version=\'1.1\';s.queue=[];u=t.createElement(n);u.async=!0;u.src=\'https://static.ads-twitter.com/uwt.js\';a=t.getElementsByTagName(n)[0];a.parentNode.insertBefore(u,a))}(window,document,\'script\');\ntwq(\'config\',\'PIXEL_ID\');\n[/S]\n<!-- End X (Twitter) Pixel Base Code -->'
+  ,
+    ga4: '<!-- GA4 Base Code -->\n[S] type=\'text/javascript\' async src=\'https://www.googletagmanager.com/gtag/js?id=PIXEL_ID\'>\n[/S]\n[S]\nwindow.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag(\'js\',new Date());gtag(\'config\',\'PIXEL_ID\');\n[/S]\n<!-- End GA4 Base Code -->'
+  };
+  for (var bpi = 0; bpi < S.platforms.length; bpi++) {
+    var bp = S.platforms[bpi];
+    var baseHtml = BASE[bp];
+    if (!baseHtml) continue;
+    var pixId = S.pixelIds[bp] || 'YOUR_PIXEL_ID';
+    baseHtml = baseHtml.replace(/PIXEL_ID/g, pixId);
+    baseHtml = baseHtml.replace(/\[S\]/g, '<scr'+'ipt>').replace(/\[\/S\]/g, '<'+'/script>');
+    tags.push({
+      accountId:'000000000', containerId:'00000000', tagId:String(tagId),
+      name: PM[bp].name + ' - Base Code',
+      type:'html',
+      parameter:[
+        {type:'TEMPLATE', key:'html', value:baseHtml},
+        {type:'BOOLEAN', key:'supportDocumentWrite', value:'false'}
+      ],
+      firingTriggerId:[allPagesTrigId],
+      fingerprint: String(Date.now() + tagId)
+    });
+    tagId++;
+  }
+
+    for (var ei = 0; ei < S.events.length; ei++) {
+    var evId = S.events[ei];
+    var ev = GA4[evId];
+    if (!trigMap[evId]) {
+      triggers.push({
+        accountId:'000000000', containerId:'00000000', triggerId:String(trigId),
+        name:'CE - ' + evId, type:'CUSTOM_EVENT',
+        customEventFilter:[{ type:'EQUALS', parameter:[
+          {type:'TEMPLATE',key:'arg0',value:'{{_event}}'},
+          {type:'TEMPLATE',key:'arg1',value:evId}
+        ]}],
+        fingerprint: String(Date.now() + trigId)
+      });
+      trigMap[evId] = String(trigId);
+      trigId++;
+    }
+    for (var pi = 0; pi < S.platforms.length; pi++) {
+      var p = S.platforms[pi];
+      var platEv = PMAP[p][evId];
+      if (!platEv) continue;
+      var html = (TAGHTML[p] && TAGHTML[p][platEv])
+        ? TAGHTML[p][platEv]
+        : '[S]\n// TODO: ' + PM[p].name + ' - ' + platEv + '\n[/S]';
+      var htmlFinal = html.replace(/\[S\]/g,'<scr'+'ipt>').replace(/\[\/S\]/g,'<'+'/script>');
+      tags.push({
+        accountId:'000000000', containerId:'00000000', tagId:String(tagId),
+        name: PM[p].name + ' - ' + ev.label, type:'html',
+        parameter:[
+          {type:'TEMPLATE',key:'html',value:htmlFinal},
+          {type:'BOOLEAN',key:'supportDocumentWrite',value:'false'}
+        ],
+        firingTriggerId:[trigMap[evId]],
+        fingerprint: String(Date.now() + tagId)
+      });
+      tagId++;
+    }
+  }
+
+  return {
+    exportFormatVersion: 2,
+    exportTime: now,
+    containerVersion: {
+      path:'accounts/000000000/containers/00000000/versions/0',
+      accountId:'000000000', containerId:'00000000', containerVersionId:'0',
+      container:{
+        path:'accounts/000000000/containers/00000000',
+        accountId:'000000000', containerId:'00000000',
+        name:'Easy Track - ' + (S.lead.name||'Client') + ' - ' + CMS[S.cms].name,
+        publicId:'GTM-XXXXXXX', usageContext:['WEB'], fingerprint:ts
+      },
+      tag:tags, trigger:triggers, variable:variables, fingerprint:ts
+    }
+  };
+}
+
+// ===== BUILD DATALAYER =====
+function buildDL() {
+  var lines = [];
+  lines.push('// ==============================================');
+  lines.push('// GTM Data Layer Code — Easy Track');
+  lines.push('// GA4 Official Schema | ' + new Date().toISOString().split('T')[0]);
+  lines.push('// ==============================================');
+  lines.push('');
+  lines.push('window.dataLayer = window.dataLayer || [];');
+  lines.push('');
+    for (var ei = 0; ei < S.events.length; ei++) {
+    var evId = S.events[ei];
+    var ev = GA4[evId];
+    lines.push('// ── ' + ev.label.toUpperCase() + ' ──');
+    lines.push("window.dataLayer.push({");
+    lines.push("  event: '" + evId + "',");
+    lines.push("  ecommerce: {");
+    for (var ri = 0; ri < ev.req.length; ri++) {
+      var r = ev.req[ri];
+      if (r === 'items') {
+        lines.push("    items: [{");
+        for (var ii = 0; ii < ev.ip.length; ii++) lines.push("      " + ev.ip[ii] + ": '',  // TODO");
+        lines.push("    }],");
+      } else {
+        lines.push("    " + r + ": '',  // required");
+      }
+    }
+    for (var oi = 0; oi < ev.opt.length; oi++) lines.push("    " + ev.opt[oi] + ": '',  // optional");
+    lines.push("  }");
+    lines.push("});");
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
+// ===== BUILD GUIDE =====
+function buildGuide() {
+  var cms = CMS[S.cms];
+  var gtmGuides = {
+    salla: 'في سلة: <code>الإعدادات → التسويق → GTM</code> → حط الـ Container ID.',
+    zid: 'في زد: <code>لوحة التحكم → التسويق → GTM</code> → أضف الـ Container ID.',
+    woocommerce: 'ثبّت Plugin: <code>GTM4WP</code> من WordPress Plugin Directory.',
+    shopify: 'في <code>Online Store → Themes → Edit Code → theme.liquid</code>، أضف GTM snippet.',
+    custom: 'أضف GTM snippet في <code>&lt;head&gt;</code> وبعد <code>&lt;body&gt;</code> في كل صفحة.'
+  };
+  var pixGuides = {
+    meta: 'في GTM: ابحث في Template Gallery عن <code>Facebook Pixel</code>. Pixel ID: <code>' + (S.pixelIds.meta||'YOUR_PIXEL_ID') + '</code>',
+    snapchat: 'في GTM: Custom HTML Tag بـ Snap Pixel base code. Pixel ID: <code>' + (S.pixelIds.snapchat||'YOUR_PIXEL_ID') + '</code>',
+    tiktok: 'في GTM: ابحث في Template Gallery عن <code>TikTok Pixel</code>. Pixel ID: <code>' + (S.pixelIds.tiktok||'YOUR_PIXEL_ID') + '</code>',
+    google: 'في GTM: Tag نوع <code>Google Ads Conversion Tracking</code>. ID: <code>' + (S.pixelIds.google||'YOUR_PIXEL_ID') + '</code>',
+    twitter: 'في GTM: Custom HTML Tag بـ X Pixel base code. Pixel ID: <code>' + (S.pixelIds.twitter||'YOUR_PIXEL_ID') + '</code>'
+  };
+  var steps = [];
+  steps.push({ t: 'تثبيت GTM على ' + cms.name, b: gtmGuides[S.cms] || '' });
+  for (var i = 0; i < S.platforms.length; i++) {
+    var p = S.platforms[i];
+    steps.push({ t: 'ربط ' + PM[p].name + ' بـ GTM', b: pixGuides[p] || '' });
+  }
+  steps.push({ t: 'استيراد GTM Container', b: '<strong>GTM → Admin → Import Container</strong> → اختار ملف <code>gtm-container.json</code> → <strong>Merge</strong> → Confirm.<br>هيضيف تلقائياً كل الـ Tags والـ Triggers والـ Variables.' });
+  steps.push({ t: 'Test & Verify', b: 'استخدم <code>GTM Preview Mode</code> وبعدين:<br>✅ <code>Meta Pixel Helper</code> · ✅ <code>Snap Pixel Helper</code> · ✅ <code>TikTok Pixel Helper</code> · ✅ <code>GA4 DebugView</code><br><br>بعد التأكد: اضغط <strong>Submit</strong> في GTM.' });
+  var html = '';
+  for (var si = 0; si < steps.length; si++) {
+    html += '<div class="gcard"><div class="gnum">' + (si+1) + '</div><div class="gtxt"><div class="gtitl">' + steps[si].t + '</div><div class="gbody">' + steps[si].b + '</div></div></div>';
+  }
+  return html;
+}
+
+// ===== BUILD SCORE =====
+function buildScore() {
+  var html = '<p style="color:var(--mut);font-size:13px;margin-bottom:16px">Score الـ Events من 1-10 بناءً على قيمتها للـ Algorithm. المصدر: <a href="https://developers.google.com/analytics/devguides/collection/ga4/reference/events" target="_blank" style="color:var(--gold)">GA4 Recommended Events</a>.</p>';
+  html += '<table class="sctable"><thead><tr><th>GA4 Event</th><th>Label</th><th>Platforms</th><th>Score</th></tr></thead><tbody>';
+    for (var ei = 0; ei < S.events.length; ei++) {
+    var evId = S.events[ei];
+    var ev = GA4[evId];
+    var plats = '';
+    for (var pi = 0; pi < S.platforms.length; pi++) {
+      var p = S.platforms[pi];
+      if (PMAP[p][evId]) plats += '<span class="ppill">' + PM[p].icon + ' ' + PM[p].name + '</span>';
+    }
+    var sc = ev.score;
+    var cls = sc >= 8 ? 'h' : sc >= 4 ? 'm' : 'l';
+    html += '<tr><td><span class="evname">' + evId + '</span></td><td style="color:var(--wht);font-weight:700">' + ev.label + '</td><td>' + plats + '</td>'
+      + '<td><div class="sbarw"><div class="sbar"><div class="sfill ' + cls + '" style="width:' + (sc*10) + '%"></div></div><span class="snum ' + cls + '">' + sc + '/10</span></div></td></tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+// ===== BUILD SUMMARY =====
+function buildSummary() {
+  var platNames = [];
+  for (var i = 0; i < S.platforms.length; i++) platNames.push(PM[S.platforms[i]].name);
+  document.getElementById('sumStrip').innerHTML =
+    '<div class="sitem"><span class="slbl">Client</span><span class="sval">' + (S.lead.name||'—') + '</span></div>' +
+    '<div class="sitem"><span class="slbl">Location</span><span class="sval">' + (S.lead.location||'—') + '</span></div>' +
+    '<div class="sitem"><span class="slbl">CMS</span><span class="sval">' + CMS[S.cms].name + '</span></div>' +
+    '<div class="sitem"><span class="slbl">Platforms</span><span class="sval">' + platNames.join(' · ') + '</span></div>' +
+    '<div class="sitem"><span class="slbl">Events</span><span class="sval">' + S.events.length + ' events</span></div>' +
+    '<div class="sitem"><span class="slbl">Schema</span><span class="sval g">GA4 Official ✓</span></div>';
+}
+
+// ===== OUTPUT TABS =====
+function oTab(id, btn) {
+  var tabs = document.querySelectorAll('.otab');
+  var panes = document.querySelectorAll('.opane');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  for (var i = 0; i < panes.length; i++) panes[i].classList.remove('on');
+  btn.classList.add('on');
+  document.getElementById('pane-'+id).classList.add('on');
+}
+
+// ===== COPY & DOWNLOAD =====
+function bindDownloads() {
+  var clientName = (S.lead.name || 'client').replace(/\s+/g, '-');
+  var today = new Date().toISOString().split('T')[0];
+
+  document.getElementById('dlJson').onclick = function() {
+    dlFile(document.getElementById('jsonBody').textContent, 'pixel-config-' + clientName + '-' + today + '.json', 'application/json');
+  };
+  document.getElementById('dlGtm').onclick = function() {
+    dlFile(document.getElementById('gtmBody').textContent, 'gtm-container-' + clientName + '-' + today + '.json', 'application/json');
+  };
+  document.getElementById('cpyJson').onclick = function() { copyEl('jsonBody', this); };
+  document.getElementById('cpyGtm').onclick  = function() { copyEl('gtmBody', this); };
+  document.getElementById('cpyDl').onclick   = function() { copyEl('dlBody', this); };
+}
+
+function dlFile(text, name, type) {
+  var blob = new Blob([text], { type: type });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function copyEl(id, btn) {
+  var text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var orig = btn.textContent;
+    btn.textContent = '✅ تم';
+    setTimeout(function() { btn.textContent = orig; }, 2000);
+  });
+}
+
+// ===== RESET =====
+function resetAll() {
+  S.cms = null; S.platforms = []; S.events = []; S.pixelIds = {};
+  document.getElementById('outWrap').classList.remove('on');
+  for (var i = 1; i <= 4; i++) document.getElementById('s'+i).classList.remove('on');
+  document.getElementById('s1').classList.add('on');
+  var allBtns = document.querySelectorAll('.cbtn');
+  for (var i = 0; i < allBtns.length; i++) allBtns[i].classList.remove('on');
+  document.getElementById('btn1').disabled = true;
+  updateProg(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+
+// ═══════════════════════════════════════
+// EASY TRACK · SESSION + SUPABASE
+// ═══════════════════════════════════════
+var SB_URL = "https://itrzwmhwqplkjunbonov.supabase.co";
+var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cnp3bWh3cXBsa2p1bmJvbm92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyODc1OTQsImV4cCI6MjA4ODg2MzU5NH0.U_yTG7gP8XIdbImhmKLbHJ2UML86tk3Hl_-0252m-bE";
+var PLAN_LIMITS = { basic: 1, growth: 3, enterprise: 999 };
+var currentUser = null;
+
+async function sbGet(table, filter) {
+  try {
+    var url = SB_URL + '/rest/v1/' + table + '?select=*' + (filter ? '&' + filter : '');
+    var res = await fetch(url, {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var txt = await res.text();
+    return txt ? JSON.parse(txt) : [];
+  } catch(e) { return []; }
+}
+
+async function sbInsert(table, data) {
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/' + table, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json', 'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(data)
+    });
+    var txt = await res.text();
+    return txt ? JSON.parse(txt) : null;
+  } catch(e) { return null; }
+}
+
+async function sbUpdate(table, filter, data) {
+  try {
+    var res = await fetch(SB_URL + '/rest/v1/' + table + '?' + filter, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+// ── INIT SESSION ──
+function initSession() {
+  try { currentUser = JSON.parse(localStorage.getItem('et_user') || 'null'); } catch(e) {}
+  
+  if (!currentUser) {
+    // Not logged in → redirect to landing
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // Update user bar
+  var plan = (currentUser.plan || 'Basic').toLowerCase();
+  var limit = PLAN_LIMITS[plan] || 1;
+  var used  = currentUser.projects_used || 0;
+  
+  document.getElementById('userName').textContent = currentUser.name || currentUser.email;
+  document.getElementById('projUsed').textContent = used;
+  document.getElementById('projMax').textContent  = limit === 999 ? '∞' : limit;
+  
+  var badge = document.getElementById('userPlanBadge');
+  badge.textContent = (currentUser.plan || 'Basic').toUpperCase();
+  badge.className   = 'plan-badge plan-' + plan;
+  
+  // Admin link
+  if (currentUser.email && (currentUser.email.includes('admin') || currentUser.is_admin)) {
+    document.getElementById('adminLink').style.display = 'flex';
+  }
+  
+  // Refresh user data from DB
+  refreshUser();
+}
+
+async function refreshUser() {
+  if (!currentUser || !currentUser.id) return;
+  var users = await sbGet('clients', 'id=eq.' + currentUser.id);
+  if (users && users[0]) {
+    currentUser = Object.assign(currentUser, users[0]);
+    localStorage.setItem('et_user', JSON.stringify(currentUser));
+    var used  = currentUser.projects_used || 0;
+    var plan  = (currentUser.plan || 'Basic').toLowerCase();
+    var limit = PLAN_LIMITS[plan] || 1;
+    document.getElementById('projUsed').textContent = used;
+    document.getElementById('projMax').textContent  = limit === 999 ? '∞' : limit;
+  }
+}
+
+function checkProjectLimit() {
+  if (!currentUser) return false;
+  var plan  = (currentUser.plan || 'Basic').toLowerCase();
+  var limit = PLAN_LIMITS[plan] || 1;
+  var used  = currentUser.projects_used || 0;
+  if (used >= limit) {
+    var msg = document.getElementById('limitMsg');
+    if (msg) msg.textContent = 'الخطة ' + (currentUser.plan || 'Basic') + ' بتسمح بـ ' + (limit === 999 ? 'مشاريع غير محدودة' : limit + ' مشروع') + '. Upgrade عشان تكمل.';
+    document.getElementById('limitBanner').style.display = 'block';
+    return false;
+  }
+  return true;
+}
+
+// Save project to Supabase after generate
+async function saveProject(config) {
+  if (!currentUser || !currentUser.id) return;
+  
+  var projectData = {
+    client_id:    currentUser.id,
+    client_name:  currentUser.name || currentUser.email,
+    name:         (S.lead && S.lead.name ? S.lead.name + ' — ' : '') + (S.cms || 'Custom') + ' Config',
+    cms:          S.cms || 'custom',
+    platforms:    S.platforms || [],
+    events_count: (S.events || []).length,
+    config:       config
+  };
+  
+  var result = await sbInsert('projects', projectData);
+  
+  if (result) {
+    // Increment projects_used
+    var newUsed = (currentUser.projects_used || 0) + 1;
+    await sbUpdate('clients', 'id=eq.' + currentUser.id, {
+      projects_used: newUsed,
+      last_active: new Date().toISOString()
+    });
+    currentUser.projects_used = newUsed;
+    localStorage.setItem('et_user', JSON.stringify(currentUser));
+    
+    // Update counter in bar
+    var plan  = (currentUser.plan || 'Basic').toLowerCase();
+    var limit = PLAN_LIMITS[plan] || 1;
+    document.getElementById('projUsed').textContent = newUsed;
+    document.getElementById('projMax').textContent  = limit === 999 ? '∞' : limit;
+    
+    console.log('Project saved to Supabase ✓');
+  }
+}
+
+function logout() {
+  localStorage.removeItem('et_user');
+  window.location.href = 'index.html';
+}
+
+// Hook into generate() to check limits + save
+var _origGenerate = generate;
+generate = async function() {
+  if (!checkProjectLimit()) return;
+  _origGenerate();
+  // Save after a short delay to let outputs build
+  setTimeout(async function() {
+    var config = {};
+    try { config = JSON.parse(document.getElementById('outJSON').textContent || '{}'); } catch(e) {}
+    await saveProject(config);
+  }, 800);
+};
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', initSession);
+// Fallback if DOM already ready
+if (document.readyState !== 'loading') initSession();
+
+</script>
+</body>
+</html>
