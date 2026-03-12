@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Easy Track — Pixel Config Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@900&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #05090f;
@@ -502,15 +502,262 @@ footer {
   .plan-card { padding:28px 20px; }
   .plan-amt { font-size:40px; }
 }
+
+/* ════════════════════════════════
+   SPLASH SCREEN
+════════════════════════════════ */
+#et-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #05090f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+#et-splash.done {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+/* grid lines */
+#et-splash::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(232,184,75,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,184,75,.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+}
+/* center glow */
+#et-splash::after {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,184,75,.1) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: sGlow 2s ease-in-out infinite alternate;
+}
+@keyframes sGlow {
+  from { transform: translate(-50%,-50%) scale(0.9); opacity: 0.7; }
+  to   { transform: translate(-50%,-50%) scale(1.1); opacity: 1; }
+}
+
+/* ── 3D Logo ── */
+.sp-scene {
+  position: relative; z-index: 10;
+  perspective: 700px;
+  width: 160px; height: 160px;
+  display: flex; align-items: center; justify-content: center;
+}
+.sp-logo {
+  width: 130px; height: 130px;
+  position: relative;
+  transform-origin: center center;
+  animation: sp3d 1.8s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes sp3d {
+  0%   { transform: rotateX(75deg) rotateY(-45deg) scale(0.15); opacity: 0; }
+  25%  { opacity: 1; }
+  65%  { transform: rotateX(-6deg) rotateY(12deg) scale(1.06); }
+  82%  { transform: rotateX(3deg) rotateY(-4deg) scale(0.97); }
+  100% { transform: rotateX(0deg) rotateY(0deg) scale(1); opacity: 1; }
+}
+.sp-logo svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0;
+  animation: spRing 0.4s ease forwards;
+}
+.sp-logo svg:nth-child(1) { animation-delay: 0.35s; }
+.sp-logo svg:nth-child(2) { animation-delay: 0.55s; }
+.sp-logo svg:nth-child(3) { animation-delay: 0.72s; }
+.sp-logo svg:nth-child(4) { animation-delay: 0.88s; }
+.sp-logo svg:nth-child(5) { animation-delay: 1.02s; }
+@keyframes spRing {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* shadow below logo */
+.sp-shadow {
+  position: absolute;
+  bottom: -14px; left: 50%;
+  transform: translateX(-50%);
+  width: 70px; height: 10px;
+  background: radial-gradient(ellipse, rgba(232,184,75,.35) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(4px);
+  opacity: 0;
+  animation: spShadow 1.8s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes spShadow {
+  0%   { opacity: 0; transform: translateX(-50%) scaleX(0.2); }
+  100% { opacity: 0.5; transform: translateX(-50%) scaleX(1); }
+}
+
+/* ── Text ── */
+.sp-text {
+  position: relative; z-index: 10;
+  text-align: center;
+  margin-top: 28px;
+}
+.sp-brand {
+  display: block;
+  font-family: 'Outfit', 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: #f0f4ff;
+  opacity: 0;
+  transform: translateY(24px);
+  animation: spText 0.6s cubic-bezier(.16,1,.3,1) 1.25s forwards;
+}
+.sp-brand .gold { color: #e8b84b; }
+.sp-mono {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #0ecfb0;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  margin-top: 10px;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: spText 0.6s cubic-bezier(.16,1,.3,1) 1.5s forwards;
+}
+@keyframes spText {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Progress bar ── */
+.sp-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,.04);
+}
+.sp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e8b84b, #0ecfb0);
+  border-radius: 0 2px 2px 0;
+  width: 0;
+  animation: spBar 2.2s ease forwards;
+}
+@keyframes spBar {
+  0%   { width: 0%; }
+  100% { width: 100%; }
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ════ SPLASH SCREEN ════ -->
+<div id="et-splash">
+  <div class="sp-scene">
+    <div class="sp-logo">
+
+      <!-- Layer 1: outer arcs (faintest) -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="130" y2="130" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#e8b84b" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#0ecfb0" stop-opacity="0.35"/>
+          </linearGradient>
+        </defs>
+        <path d="M8 60 C8 30.177 32.177 6 62 6" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M122 60 C122 30.177 97.823 6 68 6" stroke="url(#g1)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Layer 2: mid-outer arcs -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <defs>
+          <linearGradient id="g2" x1="0" y1="0" x2="130" y2="130" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#e8b84b" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#0ecfb0" stop-opacity="0.6"/>
+          </linearGradient>
+        </defs>
+        <path d="M22 60 C22 37.909 39.909 20 62 20" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M108 60 C108 37.909 90.091 20 68 20" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Layer 3: inner arcs -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <path d="M38 60 C38 47.297 48.297 37 61 37" stroke="#e8b84b" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M92 60 C92 47.297 81.703 37 69 37" stroke="#e8b84b" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Layer 4: center dot with glow -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <defs>
+          <radialGradient id="dotg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#f5d27a"/>
+            <stop offset="100%" stop-color="#e8b84b"/>
+          </radialGradient>
+          <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <circle cx="65" cy="60" r="16" fill="rgba(232,184,75,0.12)" filter="url(#dotGlow)"/>
+        <circle cx="65" cy="60" r="9" fill="url(#dotg)"/>
+      </svg>
+
+      <!-- Layer 5: tracking arrow -->
+      <svg viewBox="0 0 130 130" fill="none">
+        <defs>
+          <linearGradient id="arrowg" x1="65" y1="76" x2="65" y2="108" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#e8b84b"/>
+            <stop offset="100%" stop-color="#0ecfb0"/>
+          </linearGradient>
+        </defs>
+        <path d="M54 78 L65 106 L76 78" stroke="url(#arrowg)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+
+    </div>
+    <div class="sp-shadow"></div>
+  </div>
+
+  <div class="sp-text">
+    <span class="sp-brand">easy<span class="gold">TRACK</span></span>
+    <span class="sp-mono">Pixel Config Generator</span>
+  </div>
+
+  <div class="sp-bar"><div class="sp-bar-fill"></div></div>
+</div>
+
+<!-- ════ NAV ════ -->
 <nav>
-  <a href="#" class="logo">
-    <div class="logo-dot"></div>
-    Easy Track
+  <a href="#" class="logo" style="gap:10px; letter-spacing:0;">
+    <!-- SVG Logo Mark -->
+    <svg width="34" height="34" viewBox="0 0 64 64" fill="none" style="flex-shrink:0;">
+      <defs>
+        <linearGradient id="navG" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#e8b84b"/>
+          <stop offset="100%" stop-color="#0ecfb0"/>
+        </linearGradient>
+      </defs>
+      <path d="M4 30 C4 15.088 16.088 3 31 3" stroke="url(#navG)" stroke-width="2.5" stroke-linecap="round" opacity=".45"/>
+      <path d="M60 30 C60 15.088 47.912 3 33 3" stroke="url(#navG)" stroke-width="2.5" stroke-linecap="round" opacity=".45"/>
+      <path d="M13 30 C13 20.611 20.611 13 30 13" stroke="url(#navG)" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>
+      <path d="M51 30 C51 20.611 43.389 13 34 13" stroke="url(#navG)" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>
+      <path d="M22 30 C22 25.029 26.029 21 31 21" stroke="#e8b84b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M42 30 C42 25.029 37.971 21 33 21" stroke="#e8b84b" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="32" cy="30" r="6" fill="url(#navG)"/>
+      <path d="M27 40 L32 52 L37 40" stroke="url(#navG)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <!-- Text -->
+    <span style="display:flex;flex-direction:column;line-height:1;gap:2px;">
+      <span style="font-family:'Outfit','Cairo',sans-serif;font-weight:900;font-size:16px;letter-spacing:-0.5px;color:#f0f4ff;">easy<span style="color:#e8b84b;">TRACK</span></span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:2.5px;color:#0ecfb0;text-transform:uppercase;">Pixel Config</span>
+    </span>
   </a>
   <div class="nav-links">
     <a href="#how" class="nav-link">كيف يعمل؟</a>
@@ -518,7 +765,7 @@ footer {
     <a href="#pricing" class="nav-link">الأسعار</a>
     <a href="#" class="nav-link" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut)">EN</a>
   </div>
-  <a href="#" class="nav-cta" onclick="openModal(event)">ابدأ مجاناً ←</a>
+  <a href="#" class="nav-cta" onclick="openModal(event)">ابدأ دلوقتي ←</a>
 </nav>
 
 <!-- HERO -->
@@ -542,7 +789,7 @@ footer {
 
     <div class="hero-actions">
       <a href="#" class="btn-primary" onclick="openModal(event)">
-        🚀 ابدأ مجاناً
+        🚀 ابدأ دلوقتي
       </a>
       <a href="#how" class="btn-secondary">شوف كيف يعمل</a>
     </div>
@@ -837,8 +1084,8 @@ footer {
         <h2 class="cta-title">جاهز تعمل <em>Pixel Setup صح</em><br>من أول مرة؟</h2>
         <p class="cta-sub">انضم لـ freelancers وأجنسيز بتستخدم Easy Track عشان توفر وقتها وتقدم شغل أحسن.</p>
         <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-          <a href="#" class="btn-primary" onclick="openModal(event)">🚀 ابدأ مجاناً</a>
-          <a href="https://linkedin.com/in/youssef-elsouly" target="_blank" class="btn-secondary">تواصل مع يوسف →</a>
+          <a href="#" class="btn-primary" onclick="openModal(event)">🚀 ابدأ دلوقتي</a>
+
         </div>
       </div>
     </div>
@@ -900,6 +1147,19 @@ footer {
 </div>
 
 <script>
+/* ── Splash dismiss ── */
+(function() {
+  var splash = document.getElementById('et-splash');
+  if (!splash) return;
+  // After 2.4s → add .done class → CSS transition hides it → then remove from DOM
+  setTimeout(function() {
+    splash.classList.add('done');
+    setTimeout(function() {
+      splash.style.display = 'none';
+    }, 750);
+  }, 2400);
+})();
+
 function openModal(e) {
   if(e) e.preventDefault();
   document.getElementById('authModal').classList.add('on');
