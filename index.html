@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>D Data — Pixel Config Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>Easy Track — Pixel Config Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #05090f;
@@ -63,6 +63,7 @@ nav {
   animation:pulse 2s infinite;
 }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+@keyframes ping { 0%{transform:scale(1);opacity:.4} 100%{transform:scale(2.5);opacity:0} }
 
 .nav-links { display:flex; align-items:center; gap:32px; }
 .nav-link {
@@ -125,7 +126,7 @@ nav {
 }
 
 .hero-title {
-  font-family:'Syne',sans-serif;
+  font-family:'Cairo',sans-serif;
   font-size:clamp(36px,6vw,72px);
   font-weight:800; line-height:1.1;
   margin-bottom:8px;
@@ -261,10 +262,15 @@ section { padding:100px 48px; position:relative; }
 
 /* ─── PRICING ─── */
 .pricing-grid {
-  display:grid; grid-template-columns:repeat(3,1fr);
+  display:flex; flex-direction:row-reverse;
   gap:24px; margin-top:64px; align-items:start;
 }
-@media(max-width:900px){ .pricing-grid{grid-template-columns:1fr;} }
+.pricing-grid .plan-card { flex:1; min-width:0; }
+@media(max-width:900px){ 
+  .pricing-grid{ flex-direction:column; }
+  .pricing-grid .plan-card{ order:unset !important; }
+  .plan-card.featured{ transform:none; }
+}
 
 .plan-card {
   background:var(--bg2); border:1px solid var(--bdr2);
@@ -292,7 +298,7 @@ section { padding:100px 48px; position:relative; }
   display:flex; align-items:flex-end; gap:6px; margin-bottom:8px;
 }
 .plan-amt {
-  font-family:'Syne',sans-serif; font-size:52px;
+  font-family:'Cairo',sans-serif; font-size:52px;
   font-weight:800; color:var(--wht); line-height:1;
 }
 .plan-cur { font-size:22px; color:var(--wht2); margin-bottom:8px; }
@@ -478,8 +484,23 @@ footer {
   .nav-links { display:none; }
   section { padding:72px 20px; }
   .hero { padding:100px 20px 60px; }
-  footer { padding:32px 20px; }
+  footer { padding:32px 20px; flex-direction:column; text-align:center; }
   .cta-banner { padding:48px 24px; }
+  .hero-stats { gap:28px; }
+  .stat-num { font-size:26px; }
+  .steps-grid { grid-template-columns:1fr; }
+  .features-grid { grid-template-columns:1fr; }
+  .audience-grid { grid-template-columns:1fr; }
+  .plan-card.featured { transform:none; }
+  .hero-title { font-size:32px; }
+  .hero-sub { font-size:15px; }
+  .sec-title { font-size:26px; }
+  .plan-amt { font-size:42px; }
+}
+@media(min-width:769px) and (max-width:1100px){
+  .pricing-grid { gap:16px; }
+  .plan-card { padding:28px 20px; }
+  .plan-amt { font-size:40px; }
 }
 </style>
 </head>
@@ -489,7 +510,7 @@ footer {
 <nav>
   <a href="#" class="logo">
     <div class="logo-dot"></div>
-    D Data
+    Easy Track
   </a>
   <div class="nav-links">
     <a href="#how" class="nav-link">كيف يعمل؟</a>
@@ -514,7 +535,7 @@ footer {
     </h1>
 
     <p class="hero-sub">
-      أداة D Data بتولّد لك GTM Container + DataLayer Code + JSON Config
+      أداة Easy Track بتولّد لك GTM Container + DataLayer Code + JSON Config
       بناءً على GA4 Official Schema من Google —
       تدعم Meta وSnapchat وTikTok وGoogle Ads وX
     </p>
@@ -542,6 +563,24 @@ footer {
       <div class="stat">
         <span class="stat-num">2min</span>
         <div class="stat-lbl">SETUP TIME</div>
+      </div>
+    </div>
+
+    <!-- LIVE COUNTER -->
+    <div style="margin-top:48px; display:flex; justify-content:center;">
+      <div style="
+        display:inline-flex; align-items:center; gap:14px;
+        background:rgba(52,211,153,0.06); border:1px solid rgba(52,211,153,0.2);
+        border-radius:100px; padding:14px 28px;
+        animation:fadeUp .8s .5s ease both;
+      ">
+        <div style="position:relative;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--grn);box-shadow:0 0 12px var(--grn);"></div>
+          <div style="position:absolute;inset:0;border-radius:50%;background:var(--grn);animation:ping 1.5s infinite;opacity:0.4;"></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--grn);letter-spacing:1px;">
+          <span id="subCount">--</span> مشترك نشط دلوقتي
+        </span>
       </div>
     </div>
   </div>
@@ -716,11 +755,11 @@ footer {
     <div class="pricing-grid">
 
       <!-- BASIC -->
-      <div class="plan-card">
+      <div class="plan-card" style="order:3;">
         <div class="plan-name">Basic</div>
-        <div class="plan-price">
-          <span class="plan-cur">$</span>
+        <div class="plan-price" dir="ltr" style="justify-content:flex-end;">
           <span class="plan-amt">29</span>
+          <span class="plan-cur" style="font-size:24px;color:var(--gold);font-weight:700;margin-bottom:10px;">$</span>
         </div>
         <div class="plan-period">/ شهرياً · مشروع واحد</div>
         <div class="plan-tagline">مثالي للفريلانسر اللي بيشتغل على كلاينت واحد في نفس الوقت.</div>
@@ -739,12 +778,12 @@ footer {
       </div>
 
       <!-- GROWTH (FEATURED) -->
-      <div class="plan-card featured">
+      <div class="plan-card featured" style="order:2;">
         <div class="plan-badge">⭐ الأكثر طلباً</div>
         <div class="plan-name">Growth</div>
-        <div class="plan-price">
-          <span class="plan-cur">$</span>
+        <div class="plan-price" dir="ltr" style="justify-content:flex-end;">
           <span class="plan-amt">69</span>
+          <span class="plan-cur" style="font-size:24px;color:var(--gold);font-weight:700;margin-bottom:10px;">$</span>
         </div>
         <div class="plan-period">/ شهرياً · 3 مشاريع</div>
         <div class="plan-tagline">للفريلانسر النشيط والأجنسي الصغيرة — 3 كلايانتس في نفس الوقت.</div>
@@ -763,10 +802,10 @@ footer {
       </div>
 
       <!-- ENTERPRISE -->
-      <div class="plan-card">
+      <div class="plan-card" style="order:1;">
         <div class="plan-name">Enterprise</div>
         <div class="plan-price" style="flex-direction:column;align-items:flex-start;gap:0;">
-          <span style="font-size:32px;font-weight:900;color:var(--wht);font-family:'Syne',sans-serif;">Custom</span>
+          <span style="font-size:32px;font-weight:900;color:var(--wht);font-family:'Cairo',sans-serif;">Custom</span>
         </div>
         <div class="plan-period">اتكلم مع Sales</div>
         <div class="plan-tagline">للأجنسيز الكبيرة اللي محتاجة مشاريع غير محدودة وـ white-label.</div>
@@ -796,7 +835,7 @@ footer {
     <div class="cta-banner">
       <div class="cta-banner-inner">
         <h2 class="cta-title">جاهز تعمل <em>Pixel Setup صح</em><br>من أول مرة؟</h2>
-        <p class="cta-sub">انضم لـ freelancers وأجنسيز بتستخدم D Data عشان توفر وقتها وتقدم شغل أحسن.</p>
+        <p class="cta-sub">انضم لـ freelancers وأجنسيز بتستخدم Easy Track عشان توفر وقتها وتقدم شغل أحسن.</p>
         <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
           <a href="#" class="btn-primary" onclick="openModal(event)">🚀 ابدأ مجاناً</a>
           <a href="https://linkedin.com/in/youssef-elsouly" target="_blank" class="btn-secondary">تواصل مع يوسف →</a>
@@ -808,13 +847,13 @@ footer {
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">D Data · Pixel Config Generator</div>
+  <div class="footer-logo">Easy Track · Pixel Config Generator</div>
   <div class="footer-links">
     <a href="#" class="footer-link">Privacy</a>
     <a href="#" class="footer-link">Terms</a>
     <a href="https://linkedin.com/in/youssef-elsouly" target="_blank" class="footer-link">LinkedIn</a>
   </div>
-  <div class="footer-copy">© 2026 D Data · Built by Youssef Elsouly</div>
+  <div class="footer-copy">© 2026 Easy Track · Built by Youssef Elsouly · Easy Track</div>
 </footer>
 
 <!-- AUTH MODAL -->
@@ -822,7 +861,7 @@ footer {
   <div class="modal-wrapper">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal">
-      <h2 class="modal-title">أهلاً بيك في D Data 👋</h2>
+      <h2 class="modal-title">أهلاً بيك في Easy Track 👋</h2>
       <p class="modal-sub">سجّل حسابك وابدأ تولّد Pixel Configs احترافية في دقيقتين.</p>
 
       <div class="modal-tabs">
@@ -897,6 +936,14 @@ function handleAuth() {
 function openSales() {
   window.open('https://linkedin.com/in/youssef-elsouly', '_blank');
 }
+
+// Simulate subscriber count (replace with Supabase query later)
+var baseCount = 47;
+document.getElementById('subCount').textContent = baseCount;
+setTimeout(function(){
+  var el = document.getElementById('subCount');
+  if(el) el.textContent = baseCount + Math.floor(Math.random()*3);
+}, 3000);
 
 // Scroll reveal
 var observer = new IntersectionObserver(function(entries) {
